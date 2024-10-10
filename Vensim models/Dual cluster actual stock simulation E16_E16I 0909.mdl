@@ -1,0 +1,2013 @@
+{UTF-8}
+Adjustment towards actual at Y=
+	Adaptive responsiveness factor at Y * Discrepancy to actual at Y
+	~	Dmnl
+	~		|
+
+Adaptive responsiveness factor=
+	1/(1+EXP(-LOOKUP steepness(Responsiveness to actual*"1/Minute")*(Time since refresh*\
+		"1/Minute"-LOOKUP midpoint(Responsiveness to actual*"1/Minute"))))
+	~	Dmnl
+	~		|
+
+Adaptive responsiveness factor at Y=
+	1/(1+EXP(-LOOKUP steepness(Responsiveness to actual at Y*"1/Minute")*(Time since refresh\
+		*"1/Minute"-LOOKUP midpoint(Responsiveness to actual at Y*"1/Minute"))))
+	~	Dmnl
+	~		|
+
+Adjustment towards actual=
+	Adaptive responsiveness factor * Discrepancy to actual
+	~	Dmnl
+	~		|
+
+Time since refresh=
+	MODULO(Time - 1, Synchronization frequency)
+	~	Minute
+	~		|
+
+Adjustment towards projected=
+	(1 - Adaptive responsiveness factor) * Discrepancy to projected
+	~	Dmnl
+	~		|
+
+Adjustment towards projected at Y=
+	(1 - Adaptive responsiveness factor at Y) * Discrepancy to projected at Y
+	~	Dmnl
+	~		|
+
+Update perception at Y=
+	(Adjustment towards actual at Y + Adjustment towards projected at Y)*"1/Minute"
+	~	Dmnl/Minute
+	~		|
+
+LOOKUP midpoint(
+	[(3,0)-(72,50)],(3,1.75),(6,3.816),(9,5.8909),(12,7.9676),(15,10.0482),(18,12.13),(21\
+		,14.2107),(24,16.2909),(27,18.3706),(30,20.4501),(33,22.5293),(36,24.6085),(39,26.6875\
+		),(42,28.7664),(45,30.8452),(48,32.924),(51,35.0028),(54,37.083),(57,39.163),(60,41.2428\
+		),(63,43.3225),(66,45.4021),(69,47.4816),(72,49.5609))
+	~	Dmnl
+	~		|
+
+LOOKUP steepness(
+	[(3,0)-(72,0.5)],(3,0.3961),(6,0.4218),(9,0.353),(12,0.301),(15,0.2626),(18,0.2336),\
+		(21,0.2108),(24,0.1925),(27,0.1774),(30,0.1647),(33,0.1538),(36,0.1445),(39,0.1363)\
+		,(42,0.1291),(45,0.1227),(48,0.1169),(51,0.1118),(54,0.1071),(57,0.1028),(60,0.0989\
+		),(63,0.0953),(66,0.0919),(69,0.0889),(72,0.086))
+	~	Dmnl
+	~		|
+
+Update perception=
+	(Adjustment towards projected + Adjustment towards actual) * "1/Minute"
+	~	Dmnl/Minute
+	~		|
+
+Synchronization frequency=
+	48
+	~	Minute
+	~		|
+
+Discrepancy to actual=
+	Bike availability factor - Perceived bike availability factor
+	~	Dmnl
+	~		|
+
+Discrepancy to actual at Y=
+	Bike availability factor at Y - Perceived bike availability factor at Y
+	~	Dmnl
+	~		|
+
+"Total OOS at YING-YANG"=
+	Out of Stock of bikes + Out of Stock of bikes at Y + Out of Stock of docks + Out of Stock of docks at Y
+	~	Bikes
+	~		|
+
+Effect of incentives on rentals=
+	Rental adjustment up at X due to incentives + Rental adjustment down at X due to incentives
+	~	Bikes/Minute
+	~		|
+
+Effect of incentives on rentals at Y=
+	Rental adjustment up at Y due to incentives - Rental adjustment down at Y due to incentives
+	~	Bikes/Minute
+	~		|
+
+Effect of incentives on returns=
+	Return adjustment up at X due to incentives - Return adjustment down at X due to incentives
+	~	Bikes/Minute
+	~		|
+
+Effect of incentives on returns at Y=
+	Return adjustment up at Y due to incentives - Return adjustment down at Y due to incentives
+	~	Bikes/Minute
+	~		|
+
+Change to returns rate due to incentives at Y=
+	Effect of incentives on returns at Y * Use incentives
+	~	Bikes/Minute
+	~		|
+
+Change to returns rate due to incentives=
+	Effect of incentives on returns * Use incentives
+	~	Bikes/Minute
+	~		|
+
+Change to rentals rate due to incentives at Y=
+	Effect of incentives on rentals at Y * Use incentives
+	~	Bikes/Minute
+	~		|
+
+Change to rentals rate due to incentives=
+	Effect of incentives on rentals * Use incentives
+	~	Bikes/Minute
+	~		|
+
+Perceived bike availability factor= INTEG (
+	Update perception,
+		Projected bike availability factor)
+	~	Dmnl
+	~		|
+
+Return adjustment up at Y due to incentives=
+	IF THEN ELSE(Give at Y = 1 :AND: Take at X = 1, Inventory balancing offset with complementarity at X or Y due to take at X\
+		, IF THEN ELSE(Give at Y = 1, Expected returns uplift at Y,
+	IF THEN ELSE(Take at X = 1, Inventory balancing return offset at Y due to take at X,\
+		 0)))
+	~	Bikes/Minute
+	~		|
+
+Return adjustment down at X due to incentives=
+	IF THEN ELSE(Give at Y = 1 :AND: Take at X = 0, Inventory balancing return offset at X due to give at Y\
+		, 0)
+	~	Bikes/Minute
+	~		|
+
+Return adjustment down at Y due to incentives=
+	IF THEN ELSE(Give at X = 1 :AND: Take at Y = 0, Inventory balancing return offset at Y due to give at X\
+		, 0)
+	~	Bikes/Minute
+	~		|
+
+Return adjustment up at X due to incentives=
+	IF THEN ELSE(Give at X = 1 :AND: Take at Y = 1, Inventory balancing offset with complementarity at X or Y due to give at X
+	, IF THEN ELSE(Give at X = 1, Expected returns uplift, IF THEN ELSE(Take at Y = 1, Inventory balancing return offset at X due to take at Y
+	, 0)))
+	~	Bikes/Minute
+	~		|
+
+Rental adjustment up at X due to incentives=
+	IF THEN ELSE(Take at X = 1 :AND: Give at Y = 1, Inventory balancing offset with complementarity at X or Y due to take at X\
+		, IF THEN ELSE(Take at X = 1, Expected rentals uplift, 
+	IF THEN ELSE(Give at Y = 1, Inventory balancing rental offset at X due to give at Y,\
+		 0)))
+	~	Bikes/Minute
+	~		|
+
+Rental adjustment up at Y due to incentives=
+	IF THEN ELSE(Take at Y = 1 :AND: Give at X = 1, Inventory balancing offset with complementarity at X or Y due to give at X\
+		, IF THEN ELSE(Take at Y = 1, Expected rentals uplift at Y,
+	IF THEN ELSE(Give at X = 1, Inventory balancing rental offset at Y due to give at X,\
+		 0)))
+	~	Bikes/Minute
+	~		|
+
+Rental adjustment down at X due to incentives=
+	IF THEN ELSE(Take at Y = 1 :AND: Give at X = 0, Inventory balancing rental offset at X due to take at Y\
+		, 0)
+	~	Bikes/Minute
+	~		|
+
+Perceived bike availability factor at Y= INTEG (
+	Update perception at Y,
+		Projected bike availability factor at Y)
+	~	Dmnl
+	~		|
+
+Rental adjustment down at Y due to incentives=
+	IF THEN ELSE(Take at X = 1 :AND: Give at Y = 0, Inventory balancing return offset at Y due to give at X\
+		, 0)
+	~	Bikes/Minute
+	~		|
+
+Expected returns uplift at Y=
+	LOOKUP causal impact of give incentivization at Y(Time*"1/Minute") * Simulated normal return rate at Y
+	~	Bikes/Minute
+	~		|
+
+Expected rentals uplift=
+	LOOKUP causal impact of take incentivization(Time*"1/Minute") * Simulated normal rental rate
+	~	Bikes/Minute
+	~		|
+
+Expected rentals uplift at Y=
+	LOOKUP causal impact of take incentivization at Y(Time*"1/Minute") * Simulated normal rental rate at Y
+	~	Bikes/Minute
+	~		|
+
+Expected returns uplift=
+	LOOKUP causal impact of give incentivization(Time*"1/Minute") * Simulated normal return rate
+	~	Bikes/Minute
+	~		|
+
+Inventory balancing return offset at X due to take at Y=
+	Expected rentals uplift at Y - Inventory balancing rental offset at X due to take at Y
+	~	Bikes/Minute
+	~		|
+
+Give at X=
+	IF THEN ELSE(Pressure to incentivize give >= Pressure threshold for incentive authorization\
+		 :AND: Pressure to incentivize give at Y < Pressure threshold for incentive authorization\
+		, 1, 0)
+	~	Dmnl
+	~		|
+
+Give at Y=
+	IF THEN ELSE(Pressure to incentivize give at Y >= Pressure threshold for incentive authorization\
+		 :AND: Pressure to incentivize give < Pressure threshold for incentive authorization\
+		, 1, 0)
+	~	Dmnl
+	~		|
+
+Inventory balancing rental offset at X due to give at Y=
+	Expected returns uplift at Y - Inventory balancing return offset at X due to give at Y
+	~	Bikes/Minute
+	~		|
+
+Inventory balancing rental offset at X due to take at Y=
+	MIN(Expected rentals uplift at Y, Simulated normal rental rate)
+	~	Bikes/Minute
+	~		|
+
+Inventory balancing return offset at X due to give at Y=
+	MIN(Expected returns uplift at Y, Simulated normal return rate)
+	~	Bikes/Minute
+	~		|
+
+Inventory balancing offset with complementarity at X or Y due to give at X=
+	MAX(Expected returns uplift, Expected rentals uplift at Y)
+	~	Bikes/Minute
+	~		|
+
+Inventory balancing offset with complementarity at X or Y due to take at X=
+	MAX(Expected rentals uplift, Expected returns uplift at Y)
+	~	Bikes/Minute
+	~		|
+
+Inventory balancing rental offset at Y due to take at X=
+	MIN(Expected rentals uplift, Simulated normal rental rate at Y)
+	~	Bikes/Minute
+	~		|
+
+Inventory balancing rental offset at Y due to give at X=
+	Expected returns uplift - Inventory balancing return offset at Y due to give at X
+	~	Bikes/Minute
+	~		|
+
+Take at Y=
+	IF THEN ELSE(Pressure to incentivize take at Y >= Pressure threshold for incentive authorization\
+		 :AND: Pressure to incentivize take < Pressure threshold for incentive authorization\
+		, 1, 0)
+	~	Dmnl
+	~		|
+
+Take at X=
+	IF THEN ELSE(Pressure to incentivize take >= Pressure threshold for incentive authorization\
+		 :AND: Pressure to incentivize take at Y < Pressure threshold for incentive authorization\
+		, 1, 0)
+	~	Dmnl
+	~		|
+
+Inventory balancing return offset at Y due to take at X=
+	Expected rentals uplift - Inventory balancing rental offset at Y due to take at X
+	~	Bikes/Minute
+	~		|
+
+Inventory balancing return offset at Y due to give at X=
+	MIN(Expected returns uplift, Simulated normal return rate at Y)
+	~	Bikes/Minute
+	~		|
+
+Out of Stock of docks= INTEG (
+	Dock stockouts,
+		0)
+	~	Bikes
+	~		|
+
+Out of Stock of docks at Y= INTEG (
+	Dock stockouts at Y,
+		0)
+	~	Bikes
+	~		|
+
+Dock stockouts at Y=
+	-1 * MIN(0, Return rate at Y - Simulated normal return rate at Y)
+	~	Bikes/Minute
+	~		|
+
+Out of Stock of bikes= INTEG (
+	Bike stockouts,
+		0)
+	~	Bikes
+	~		|
+
+Bike stockouts=
+	-1 * MIN(0, Rental rate - Simulated normal rental rate)
+	~	Bikes/Minute
+	~		|
+
+Bike stockouts at Y=
+	-1 * MIN(0, Rental rate at Y - Simulated normal rental rate at Y)
+	~	Bikes/Minute
+	~		|
+
+Dock stockouts=
+	-1 * MIN(0, Return rate - Simulated normal return rate)
+	~	Bikes/Minute
+	~		|
+
+Out of Stock of bikes at Y= INTEG (
+	Bike stockouts at Y,
+		0)
+	~	Bikes
+	~		|
+
+LOOKUP causal impact of give incentivization(
+	[(0,0)-(144,2)],(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(\
+		11,0),(12,0),(13,0),(14,0),(15,0),(16,0),(17,0),(18,0),(19,0),(20,0),(21,0),(22,0),\
+		(23,0),(24,0),(25,0),(26,0),(27,0),(28,0),(29,0),(30,0),(31,0),(32,0),(33,0),(34,0)\
+		,(35,0),(36,0),(37,0),(38,0),(39,0),(40,0),(41,0),(42,0),(43,0.56),(44,0.56),(45,0.56\
+		),(46,0.56),(47,0.56),(48,0.56),(49,0.87),(50,0.87),(51,0.87),(52,0.87),(53,0.87),(\
+		54,0.87),(55,0.46),(56,0.46),(57,0.46),(58,0.46),(59,0.46),(60,0.46),(61,0.4),(62,0.4\
+		),(63,0.4),(64,0.4),(65,0.4),(66,0.4),(67,0.99),(68,0.99),(69,0.99),(70,0.99),(71,0.99\
+		),(72,0.99),(73,0.71),(74,0.71),(75,0.71),(76,0.71),(77,0.71),(78,0.71),(79,0.46),(\
+		80,0.46),(81,0.46),(82,0.46),(83,0.46),(84,0.46),(85,0.56),(86,0.56),(87,0.56),(88,\
+		0.56),(89,0.56),(90,0.56),(91,0.96),(92,0.96),(93,0.96),(94,0.96),(95,0.96),(96,0.96\
+		),(97,0.51),(98,0.51),(99,0.51),(100,0.51),(101,0.51),(102,0.51),(103,0.55),(104,0.55\
+		),(105,0.55),(106,0.55),(107,0.55),(108,0.55),(109,0.65),(110,0.65),(111,0.65),(112\
+		,0.65),(113,0.65),(114,0.65),(115,0.5),(116,0.5),(117,0.5),(118,0.5),(119,0.5),(120\
+		,0.5),(121,0.57),(122,0.57),(123,0.57),(124,0.57),(125,0.57),(126,0.57),(127,1.39),\
+		(128,1.39),(129,1.39),(130,1.39),(131,1.39),(132,1.39),(133,0),(134,0),(135,0),(136\
+		,0),(137,0),(138,0),(139,0),(140,0),(141,0),(142,0),(143,0),(144,0))
+	~	Dmnl
+	~		|
+
+LOOKUP causal impact of give incentivization at Y(
+	[(0,0)-(144,2)],(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(\
+		11,0),(12,0),(13,0),(14,0),(15,0),(16,0),(17,0),(18,0),(19,0),(20,0),(21,0),(22,0),\
+		(23,0),(24,0),(25,0),(26,0),(27,0),(28,0),(29,0),(30,0),(31,0),(32,0),(33,0),(34,0)\
+		,(35,0),(36,0),(37,0),(38,0),(39,0),(40,0),(41,0),(42,0),(43,0.56),(44,0.56),(45,0.56\
+		),(46,0.56),(47,0.56),(48,0.56),(49,0.87),(50,0.87),(51,0.87),(52,0.87),(53,0.87),(\
+		54,0.87),(55,0.46),(56,0.46),(57,0.46),(58,0.46),(59,0.46),(60,0.46),(61,0.4),(62,0.4\
+		),(63,0.4),(64,0.4),(65,0.4),(66,0.4),(67,0.99),(68,0.99),(69,0.99),(70,0.99),(71,0.99\
+		),(72,0.99),(73,0.71),(74,0.71),(75,0.71),(76,0.71),(77,0.71),(78,0.71),(79,0.46),(\
+		80,0.46),(81,0.46),(82,0.46),(83,0.46),(84,0.46),(85,0.56),(86,0.56),(87,0.56),(88,\
+		0.56),(89,0.56),(90,0.56),(91,0.96),(92,0.96),(93,0.96),(94,0.96),(95,0.96),(96,0.96\
+		),(97,0.51),(98,0.51),(99,0.51),(100,0.51),(101,0.51),(102,0.51),(103,0.55),(104,0.55\
+		),(105,0.55),(106,0.55),(107,0.55),(108,0.55),(109,0.65),(110,0.65),(111,0.65),(112\
+		,0.65),(113,0.65),(114,0.65),(115,0.5),(116,0.5),(117,0.5),(118,0.5),(119,0.5),(120\
+		,0.5),(121,0.57),(122,0.57),(123,0.57),(124,0.57),(125,0.57),(126,0.57),(127,1.39),\
+		(128,1.39),(129,1.39),(130,1.39),(131,1.39),(132,1.39),(133,0),(134,0),(135,0),(136\
+		,0),(137,0),(138,0),(139,0),(140,0),(141,0),(142,0),(143,0),(144,0))
+	~	Dmnl
+	~		|
+
+LOOKUP causal impact of take incentivization at Y(
+	[(0,0)-(144,1)],(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(\
+		11,0),(12,0),(13,0),(14,0),(15,0),(16,0),(17,0),(18,0),(19,0),(20,0),(21,0),(22,0),\
+		(23,0),(24,0),(25,0),(26,0),(27,0),(28,0),(29,0),(30,0),(31,0),(32,0),(33,0),(34,0)\
+		,(35,0),(36,0),(37,0),(38,0),(39,0),(40,0),(41,0),(42,0),(43,0.63),(44,0.63),(45,0.63\
+		),(46,0.63),(47,0.63),(48,0.63),(49,0.85),(50,0.85),(51,0.85),(52,0.85),(53,0.85),(\
+		54,0.85),(55,0.4),(56,0.4),(57,0.4),(58,0.4),(59,0.4),(60,0.4),(61,0.36),(62,0.36),\
+		(63,0.36),(64,0.36),(65,0.36),(66,0.36),(67,0.27),(68,0.27),(69,0.27),(70,0.27),(71\
+		,0.27),(72,0.27),(73,0.78),(74,0.78),(75,0.78),(76,0.78),(77,0.78),(78,0.78),(79,0.62\
+		),(80,0.62),(81,0.62),(82,0.62),(83,0.62),(84,0.62),(85,0.81),(86,0.81),(87,0.81),(\
+		88,0.81),(89,0.81),(90,0.81),(91,0.92),(92,0.92),(93,0.92),(94,0.92),(95,0.92),(96,\
+		0.92),(97,0.5),(98,0.5),(99,0.5),(100,0.5),(101,0.5),(102,0.5),(103,0.48),(104,0.48\
+		),(105,0.48),(106,0.48),(107,0.48),(108,0.48),(109,0.31),(110,0.31),(111,0.31),(112\
+		,0.31),(113,0.31),(114,0.31),(115,0.8),(116,0.8),(117,0.8),(118,0.8),(119,0.8),(120\
+		,0.8),(121,0),(122,0),(123,0),(124,0),(125,0),(126,0),(127,0.43),(128,0.43),(129,0.43\
+		),(130,0.43),(131,0.43),(132,0.43),(133,0),(134,0),(135,0),(136,0),(137,0),(138,0),\
+		(139,0),(140,0),(141,0),(142,0),(143,0),(144,0))
+	~	Dmnl
+	~		|
+
+LOOKUP causal impact of take incentivization(
+	[(0,0)-(144,1)],(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(\
+		11,0),(12,0),(13,0),(14,0),(15,0),(16,0),(17,0),(18,0),(19,0),(20,0),(21,0),(22,0),\
+		(23,0),(24,0),(25,0),(26,0),(27,0),(28,0),(29,0),(30,0),(31,0),(32,0),(33,0),(34,0)\
+		,(35,0),(36,0),(37,0),(38,0),(39,0),(40,0),(41,0),(42,0),(43,0.63),(44,0.63),(45,0.63\
+		),(46,0.63),(47,0.63),(48,0.63),(49,0.85),(50,0.85),(51,0.85),(52,0.85),(53,0.85),(\
+		54,0.85),(55,0.4),(56,0.4),(57,0.4),(58,0.4),(59,0.4),(60,0.4),(61,0.36),(62,0.36),\
+		(63,0.36),(64,0.36),(65,0.36),(66,0.36),(67,0.27),(68,0.27),(69,0.27),(70,0.27),(71\
+		,0.27),(72,0.27),(73,0.78),(74,0.78),(75,0.78),(76,0.78),(77,0.78),(78,0.78),(79,0.62\
+		),(80,0.62),(81,0.62),(82,0.62),(83,0.62),(84,0.62),(85,0.81),(86,0.81),(87,0.81),(\
+		88,0.81),(89,0.81),(90,0.81),(91,0.92),(92,0.92),(93,0.92),(94,0.92),(95,0.92),(96,\
+		0.92),(97,0.5),(98,0.5),(99,0.5),(100,0.5),(101,0.5),(102,0.5),(103,0.48),(104,0.48\
+		),(105,0.48),(106,0.48),(107,0.48),(108,0.48),(109,0.31),(110,0.31),(111,0.31),(112\
+		,0.31),(113,0.31),(114,0.31),(115,0.8),(116,0.8),(117,0.8),(118,0.8),(119,0.8),(120\
+		,0.8),(121,0),(122,0),(123,0),(124,0),(125,0),(126,0),(127,0.43),(128,0.43),(129,0.43\
+		),(130,0.43),(131,0.43),(132,0.43),(133,0),(134,0),(135,0),(136,0),(137,0),(138,0),\
+		(139,0),(140,0),(141,0),(142,0),(143,0),(144,0))
+	~	Dmnl
+	~		|
+
+Pressure to incentivize give at Y=
+	Perception of risk of OOS due to bike unavailability at Y + Perception of risk of OOS due to dock unavailability
+	~	Dmnl
+	~		|
+
+Adjustments to simulated return rate at Y=
+	ABS(Return rate at Y - Simulated normal return rate at Y)
+	~	Bikes/Minute
+	~		|
+
+Adjustments to simulated rental rate at Y=
+	ABS(Rental rate at Y - Simulated normal rental rate at Y)
+	~	Bikes/Minute
+	~		|
+
+Cumulated return rate adjustments at Y= INTEG (
+	Adjustments to simulated return rate at Y,
+		0)
+	~	Bikes
+	~		|
+
+Pressure to incentivize take at Y=
+	Perception of risk of OOS due to dock unavailability at Y + Perception of risk of OOS due to bike unavailability
+	~	Dmnl
+	~		|
+
+Pressure to incentivize take=
+	Perception of risk of OOS due to dock unavailability + Perception of risk of OOS due to bike unavailability at Y
+	~	Dmnl
+	~		|
+
+Cumulated rental rate adjustments at Y= INTEG (
+	Adjustments to simulated rental rate at Y,
+		0)
+	~	Bikes
+	~		|
+
+Pressure to incentivize give=
+	Perception of risk of OOS due to bike unavailability + Perception of risk of OOS due to dock unavailability at Y
+	~	Dmnl
+	~		|
+
+User perception of attractiveness for returns at Y=
+	Table for UPoA as a function of dock availability at Y(Dock availability factor at Y\
+		)
+	~	Dmnl
+	~		|
+
+Perception delay at Y=
+	3
+	~	Minute [3,12,3]
+	~		|
+
+Perception of returns risk update at Y=
+	(Out of stock risk due to bike unavailability at Y - Perception of risk of OOS due to bike unavailability at Y\
+		)/Perception delay at Y
+	~	Dmnl/Minute
+	~		|
+
+Bike availability factor at Y=
+	QUANTUM(Cluster yang or Y bike stock / Cluster capacity at Y, 0.01)
+	~	Dmnl
+	~		|
+
+Perception of risk of OOS due to bike unavailability at Y= INTEG (
+	Perception of returns risk update at Y,
+		0.5)
+	~	Dmnl
+	~		|
+
+Perception of risk of OOS due to dock unavailability at Y= INTEG (
+	Perception or rentals risk update at Y,
+		0)
+	~	Dmnl
+	~		|
+
+Change to rentals rate due to UPoA at Y=
+	Simulated normal rental rate at Y * ((User perception of attractiveness for rentals at Y\
+		 - 1) * Use attractiveness quotient at Y)
+	~	Bikes/Minute
+	~		|
+
+Perception or rentals risk update at Y=
+	(Out of stock risk due to dock unavailability at Y - Perception of risk of OOS due to dock unavailability at Y\
+		)/Perception delay at Y
+	~	Dmnl/Minute
+	~		|
+
+Change to returns rate due to UPoA at Y=
+	Simulated normal return rate at Y * ((User perception of attractiveness for returns at Y\
+		 - 1) * Use attractiveness quotient at Y)
+	~	Bikes/Minute
+	~		|
+
+Cluster capacity at Y=
+	79
+	~	Bikes
+	~		|
+
+Cluster yang or Y bike stock= INTEG (
+	Return rate at Y-Rental rate at Y,
+		0)
+	~	Bikes
+	~		|
+
+LOOKUP return rate at Y(
+	[(0,0)-(144,4)],(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(\
+		11,0),(12,0),(13,1),(14,0),(15,0),(16,0),(17,0),(18,0),(19,0),(20,0),(21,0),(22,0),\
+		(23,0),(24,0),(25,0),(26,0),(27,0),(28,0),(29,0),(30,0),(31,0),(32,0),(33,0),(34,0)\
+		,(35,0),(36,0),(37,0),(38,0),(39,0),(40,2),(41,2),(42,1),(43,2),(44,2),(45,2),(46,1\
+		),(47,1),(48,0),(49,3),(50,0),(51,2),(52,3),(53,3),(54,3),(55,3),(56,3),(57,3),(58,\
+		2),(59,4),(60,3),(61,3),(62,3),(63,1),(64,2),(65,0),(66,1),(67,0),(68,2),(69,2),(70\
+		,1),(71,2),(72,2),(73,1),(74,2),(75,2),(76,1),(77,2),(78,2),(79,2),(80,1),(81,1),(82\
+		,2),(83,1),(84,1),(85,2),(86,3),(87,1),(88,1),(89,2),(90,1),(91,1),(92,2),(93,4),(94\
+		,1),(95,1),(96,1),(97,1),(98,1),(99,1),(100,1),(101,2),(102,2),(103,2),(104,2),(105\
+		,1),(106,3),(107,3),(108,3),(109,3),(110,3),(111,3),(112,2),(113,1),(114,0),(115,0)\
+		,(116,3),(117,2),(118,4),(119,2),(120,2),(121,2),(122,0),(123,0),(124,0),(125,3),(126\
+		,2),(127,0),(128,2),(129,1),(130,2),(131,2),(132,0),(133,1),(134,0),(135,0),(136,1)\
+		,(137,1),(138,2),(139,0),(140,1),(141,0),(142,0),(143,0),(144,0))
+	~	Bikes/Minute
+	~		|
+
+Projected bike availability factor at Y=
+	LOOKUP projected bike availability factor at Y(Time*"1/Minute")
+	~	Dmnl
+	~		|
+
+Out of stock risk due to bike unavailability at Y=
+	"Table for OOS risk as a function of Bike availability factor - GLB at Y"(QUANTUM(Perceived bike availability factor less GLB at Y\
+		, 0.001))
+	~	Dmnl
+	~		|
+
+Rental rate at Y=
+	MIN(Cluster yang or Y bike stock * "1/Minute", Simulated normal rental rate at Y + Change to rentals rate due to UPoA at Y
+	 + Change to rentals rate due to incentives at Y)
+	~	Bikes/Minute
+	~		|
+
+Responsiveness to actual at Y=
+	6
+	~	Minute [3,72,3]
+	~		|
+
+Discrepancy to projected at Y=
+	Projected bike availability factor at Y - Perceived bike availability factor at Y
+	~	Dmnl
+	~		|
+
+Dock availability factor at Y=
+	1 - Bike availability factor at Y
+	~	Dmnl
+	~		|
+
+Return rate at Y=
+	MIN((Cluster capacity at Y - Cluster yang or Y bike stock) * "1/Minute", Simulated normal return rate at Y\
+		 + Change to returns rate due to UPoA at Y
+	 + Change to returns rate due to incentives at Y)
+	~	Bikes/Minute
+	~		|
+
+LOOKUP rental rate at Y(
+	[(0,0)-(144,5)],(0,1),(1,0),(2,2),(3,0),(4,1),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(\
+		11,0),(12,0),(13,0),(14,0),(15,0),(16,0),(17,0),(18,0),(19,0),(20,0),(21,0),(22,0),\
+		(23,0),(24,0),(25,0),(26,0),(27,0),(28,0),(29,0),(30,0),(31,0),(32,0),(33,0),(34,0)\
+		,(35,1),(36,0),(37,1),(38,0),(39,0),(40,0),(41,4),(42,2),(43,0),(44,1),(45,0),(46,1\
+		),(47,1),(48,1),(49,4),(50,0),(51,3),(52,1),(53,3),(54,0),(55,1),(56,3),(57,1),(58,\
+		0),(59,0),(60,0),(61,3),(62,3),(63,1),(64,0),(65,1),(66,0),(67,1),(68,3),(69,2),(70\
+		,1),(71,4),(72,0),(73,1),(74,2),(75,1),(76,1),(77,1),(78,1),(79,2),(80,1),(81,1),(82\
+		,1),(83,2),(84,0),(85,1),(86,0),(87,1),(88,2),(89,0),(90,1),(91,1),(92,2),(93,1),(94\
+		,2),(95,3),(96,1),(97,2),(98,2),(99,2),(100,2),(101,2),(102,4),(103,2),(104,3),(105\
+		,3),(106,1),(107,3),(108,1),(109,1),(110,3),(111,2),(112,4),(113,2),(114,1),(115,2)\
+		,(116,5),(117,3),(118,2),(119,0),(120,1),(121,4),(122,2),(123,4),(124,2),(125,0),(126\
+		,1),(127,1),(128,0),(129,0),(130,2),(131,2),(132,1),(133,3),(134,2),(135,1),(136,0)\
+		,(137,1),(138,1),(139,0),(140,1),(141,2),(142,2),(143,0),(144,0))
+	~	Bikes/Minute
+	~		|
+
+Simulated normal rental rate at Y=
+	LOOKUP rental rate at Y(Time*"1/Minute")
+	~	Bikes/Minute
+	~		|
+
+Goal for lower bound for bike availability or GLB at Y=
+	0.3
+	~	Dmnl [0.1,0.5,0.01]
+	~		|
+
+"Table for OOS risk as a function of Bike availability factor - GLB at Y"(
+	[(-0.3,0)-(0.01,1)],(-0.3,1),(-0.299,1),(-0.298,1),(-0.297,1),(-0.296,1),(-0.295,1),\
+		(-0.294,1),(-0.293,1),(-0.292,1),(-0.291,1),(-0.29,1),(-0.289,0.999),(-0.288,0.999)\
+		,(-0.287,0.999),(-0.286,0.999),(-0.285,0.999),(-0.284,0.999),(-0.283,0.999),(-0.282\
+		,0.999),(-0.281,0.999),(-0.28,0.999),(-0.279,0.999),(-0.278,0.999),(-0.277,0.999),(\
+		-0.276,0.999),(-0.275,0.998),(-0.274,0.998),(-0.273,0.998),(-0.272,0.998),(-0.271,0.998\
+		),(-0.27,0.998),(-0.269,0.998),(-0.268,0.997),(-0.267,0.997),(-0.266,0.997),(-0.265\
+		,0.997),(-0.264,0.997),(-0.263,0.997),(-0.262,0.996),(-0.261,0.996),(-0.26,0.996),(\
+		-0.259,0.996),(-0.258,0.996),(-0.257,0.995),(-0.256,0.995),(-0.255,0.995),(-0.254,0.995\
+		),(-0.253,0.994),(-0.252,0.994),(-0.251,0.994),(-0.25,0.993),(-0.249,0.993),(-0.248\
+		,0.993),(-0.247,0.992),(-0.246,0.992),(-0.245,0.992),(-0.244,0.991),(-0.243,0.991),\
+		(-0.242,0.991),(-0.241,0.99),(-0.24,0.99),(-0.239,0.989),(-0.238,0.989),(-0.237,0.988\
+		),(-0.236,0.988),(-0.235,0.987),(-0.234,0.987),(-0.233,0.986),(-0.232,0.986),(-0.231\
+		,0.985),(-0.23,0.985),(-0.229,0.984),(-0.228,0.983),(-0.227,0.983),(-0.226,0.982),(\
+		-0.225,0.982),(-0.224,0.981),(-0.223,0.98),(-0.222,0.98),(-0.221,0.979),(-0.22,0.978\
+		),(-0.219,0.977),(-0.218,0.977),(-0.217,0.976),(-0.216,0.975),(-0.215,0.974),(-0.214\
+		,0.973),(-0.213,0.972),(-0.212,0.972),(-0.211,0.971),(-0.21,0.97),(-0.209,0.969),(-\
+		0.208,0.968),(-0.207,0.967),(-0.206,0.966),(-0.205,0.965),(-0.204,0.964),(-0.203,0.963\
+		),(-0.202,0.962),(-0.201,0.961),(-0.2,0.959),(-0.199,0.958),(-0.198,0.957),(-0.197,\
+		0.956),(-0.196,0.955),(-0.195,0.954),(-0.194,0.952),(-0.193,0.951),(-0.192,0.95),(-\
+		0.191,0.948),(-0.19,0.947),(-0.189,0.946),(-0.188,0.944),(-0.187,0.943),(-0.186,0.941\
+		),(-0.185,0.94),(-0.184,0.938),(-0.183,0.937),(-0.182,0.935),(-0.181,0.934),(-0.18,\
+		0.932),(-0.179,0.93),(-0.178,0.929),(-0.177,0.927),(-0.176,0.925),(-0.175,0.924),(-\
+		0.174,0.922),(-0.173,0.92),(-0.172,0.918),(-0.171,0.916),(-0.17,0.915),(-0.169,0.913\
+		),(-0.168,0.911),(-0.167,0.909),(-0.166,0.907),(-0.165,0.905),(-0.164,0.903),(-0.163\
+		,0.901),(-0.162,0.898),(-0.161,0.896),(-0.16,0.894),(-0.159,0.892),(-0.158,0.89),(-\
+		0.157,0.887),(-0.156,0.885),(-0.155,0.883),(-0.154,0.88),(-0.153,0.878),(-0.152,0.876\
+		),(-0.151,0.873),(-0.15,0.871),(-0.149,0.868),(-0.148,0.866),(-0.147,0.863),(-0.146\
+		,0.86),(-0.145,0.858),(-0.144,0.855),(-0.143,0.852),(-0.142,0.85),(-0.141,0.847),(-\
+		0.14,0.844),(-0.139,0.841),(-0.138,0.838),(-0.137,0.835),(-0.136,0.832),(-0.135,0.829\
+		),(-0.134,0.826),(-0.133,0.823),(-0.132,0.82),(-0.131,0.817),(-0.13,0.814),(-0.129,\
+		0.81),(-0.128,0.807),(-0.127,0.804),(-0.126,0.8),(-0.125,0.797),(-0.124,0.794),(-0.123\
+		,0.79),(-0.122,0.787),(-0.121,0.783),(-0.12,0.78),(-0.119,0.776),(-0.118,0.772),(-0.117\
+		,0.769),(-0.116,0.765),(-0.115,0.761),(-0.114,0.757),(-0.113,0.753),(-0.112,0.75),(\
+		-0.111,0.746),(-0.11,0.742),(-0.109,0.738),(-0.108,0.734),(-0.107,0.729),(-0.106,0.725\
+		),(-0.105,0.721),(-0.104,0.717),(-0.103,0.713),(-0.102,0.708),(-0.101,0.704),(-0.1,\
+		0.7),(-0.099,0.695),(-0.098,0.691),(-0.097,0.686),(-0.096,0.681),(-0.095,0.677),(-0.094\
+		,0.672),(-0.093,0.667),(-0.092,0.663),(-0.091,0.658),(-0.09,0.653),(-0.089,0.648),(\
+		-0.088,0.643),(-0.087,0.638),(-0.086,0.633),(-0.085,0.628),(-0.084,0.623),(-0.083,0.618\
+		),(-0.082,0.612),(-0.081,0.607),(-0.08,0.602),(-0.079,0.596),(-0.078,0.591),(-0.077\
+		,0.586),(-0.076,0.58),(-0.075,0.574),(-0.074,0.569),(-0.073,0.563),(-0.072,0.557),(\
+		-0.071,0.552),(-0.07,0.546),(-0.069,0.54),(-0.068,0.534),(-0.067,0.528),(-0.066,0.522\
+		),(-0.065,0.516),(-0.064,0.51),(-0.063,0.504),(-0.062,0.497),(-0.061,0.491),(-0.06,\
+		0.485),(-0.059,0.478),(-0.058,0.472),(-0.057,0.465),(-0.056,0.459),(-0.055,0.452),(\
+		-0.054,0.446),(-0.053,0.439),(-0.052,0.432),(-0.051,0.425),(-0.05,0.418),(-0.049,0.412\
+		),(-0.048,0.405),(-0.047,0.397),(-0.046,0.39),(-0.045,0.383),(-0.044,0.376),(-0.043\
+		,0.369),(-0.042,0.361),(-0.041,0.354),(-0.04,0.347),(-0.039,0.339),(-0.038,0.332),(\
+		-0.037,0.324),(-0.036,0.316),(-0.035,0.309),(-0.034,0.301),(-0.033,0.293),(-0.032,0.285\
+		),(-0.031,0.277),(-0.03,0.269),(-0.029,0.261),(-0.028,0.253),(-0.027,0.245),(-0.026\
+		,0.236),(-0.025,0.228),(-0.024,0.22),(-0.023,0.211),(-0.022,0.203),(-0.021,0.194),(\
+		-0.02,0.186),(-0.019,0.177),(-0.018,0.168),(-0.017,0.159),(-0.016,0.151),(-0.015,0.142\
+		),(-0.014,0.133),(-0.013,0.124),(-0.012,0.114),(-0.011,0.105),(-0.01,0.096),(-0.009\
+		,0.087),(-0.008,0.077),(-0.007,0.068),(-0.006,0.058),(-0.005,0.049),(-0.004,0.039),\
+		(-0.003,0.029),(-0.002,0.02),(-0.001,0.01),(0,0),(0.001,0),(0.002,0),(0.003,0),(0.004\
+		,0),(0.005,0))
+	~	Dmnl
+	~		|
+
+Goal for upper bound for bike availability or GUB at Y=
+	0.7
+	~	Dmnl [0.5,0.9,0.01]
+	~		|
+
+"Table for OOS risk as a function of GUB - Bike availability factor at Y"(
+	[(-0.3,0)-(0.01,1)],(-0.3,1),(-0.299,1),(-0.298,0.999),(-0.297,0.999),(-0.296,0.999)\
+		,(-0.295,0.998),(-0.294,0.998),(-0.293,0.998),(-0.292,0.997),(-0.291,0.997),(-0.29,\
+		0.997),(-0.289,0.996),(-0.288,0.996),(-0.287,0.995),(-0.286,0.995),(-0.285,0.995),(\
+		-0.284,0.994),(-0.283,0.994),(-0.282,0.994),(-0.281,0.993),(-0.28,0.993),(-0.279,0.992\
+		),(-0.278,0.992),(-0.277,0.991),(-0.276,0.991),(-0.275,0.991),(-0.274,0.99),(-0.273\
+		,0.99),(-0.272,0.989),(-0.271,0.989),(-0.27,0.988),(-0.269,0.988),(-0.268,0.987),(-\
+		0.267,0.987),(-0.266,0.986),(-0.265,0.986),(-0.264,0.985),(-0.263,0.985),(-0.262,0.984\
+		),(-0.261,0.984),(-0.26,0.983),(-0.259,0.983),(-0.258,0.982),(-0.257,0.981),(-0.256\
+		,0.981),(-0.255,0.98),(-0.254,0.98),(-0.253,0.979),(-0.252,0.978),(-0.251,0.978),(-\
+		0.25,0.977),(-0.249,0.976),(-0.248,0.976),(-0.247,0.975),(-0.246,0.974),(-0.245,0.973\
+		),(-0.244,0.973),(-0.243,0.972),(-0.242,0.971),(-0.241,0.97),(-0.24,0.97),(-0.239,0.969\
+		),(-0.238,0.968),(-0.237,0.967),(-0.236,0.966),(-0.235,0.965),(-0.234,0.965),(-0.233\
+		,0.964),(-0.232,0.963),(-0.231,0.962),(-0.23,0.961),(-0.229,0.96),(-0.228,0.959),(-\
+		0.227,0.958),(-0.226,0.957),(-0.225,0.956),(-0.224,0.955),(-0.223,0.954),(-0.222,0.953\
+		),(-0.221,0.952),(-0.22,0.951),(-0.219,0.95),(-0.218,0.949),(-0.217,0.948),(-0.216,\
+		0.946),(-0.215,0.945),(-0.214,0.944),(-0.213,0.943),(-0.212,0.942),(-0.211,0.94),(-\
+		0.21,0.939),(-0.209,0.938),(-0.208,0.937),(-0.207,0.935),(-0.206,0.934),(-0.205,0.933\
+		),(-0.204,0.931),(-0.203,0.93),(-0.202,0.928),(-0.201,0.927),(-0.2,0.926),(-0.199,0.924\
+		),(-0.198,0.923),(-0.197,0.921),(-0.196,0.92),(-0.195,0.918),(-0.194,0.916),(-0.193\
+		,0.915),(-0.192,0.913),(-0.191,0.912),(-0.19,0.91),(-0.189,0.908),(-0.188,0.907),(-\
+		0.187,0.905),(-0.186,0.903),(-0.185,0.901),(-0.184,0.9),(-0.183,0.898),(-0.182,0.896\
+		),(-0.181,0.894),(-0.18,0.892),(-0.179,0.89),(-0.178,0.888),(-0.177,0.886),(-0.176,\
+		0.884),(-0.175,0.882),(-0.174,0.88),(-0.173,0.878),(-0.172,0.876),(-0.171,0.874),(-\
+		0.17,0.872),(-0.169,0.87),(-0.168,0.868),(-0.167,0.866),(-0.166,0.863),(-0.165,0.861\
+		),(-0.164,0.859),(-0.163,0.857),(-0.162,0.854),(-0.161,0.852),(-0.16,0.849),(-0.159\
+		,0.847),(-0.158,0.845),(-0.157,0.842),(-0.156,0.84),(-0.155,0.837),(-0.154,0.835),(\
+		-0.153,0.832),(-0.152,0.829),(-0.151,0.827),(-0.15,0.824),(-0.149,0.821),(-0.148,0.819\
+		),(-0.147,0.816),(-0.146,0.813),(-0.145,0.81),(-0.144,0.807),(-0.143,0.805),(-0.142\
+		,0.802),(-0.141,0.799),(-0.14,0.796),(-0.139,0.793),(-0.138,0.79),(-0.137,0.787),(-\
+		0.136,0.784),(-0.135,0.781),(-0.134,0.777),(-0.133,0.774),(-0.132,0.771),(-0.131,0.768\
+		),(-0.13,0.765),(-0.129,0.761),(-0.128,0.758),(-0.127,0.755),(-0.126,0.751),(-0.125\
+		,0.748),(-0.124,0.744),(-0.123,0.741),(-0.122,0.737),(-0.121,0.734),(-0.12,0.73),(-\
+		0.119,0.726),(-0.118,0.723),(-0.117,0.719),(-0.116,0.715),(-0.115,0.711),(-0.114,0.708\
+		),(-0.113,0.704),(-0.112,0.7),(-0.111,0.696),(-0.11,0.692),(-0.109,0.688),(-0.108,0.684\
+		),(-0.107,0.68),(-0.106,0.676),(-0.105,0.672),(-0.104,0.668),(-0.103,0.663),(-0.102\
+		,0.659),(-0.101,0.655),(-0.1,0.651),(-0.099,0.646),(-0.098,0.642),(-0.097,0.637),(-\
+		0.096,0.633),(-0.095,0.628),(-0.094,0.624),(-0.093,0.619),(-0.092,0.615),(-0.091,0.61\
+		),(-0.09,0.605),(-0.089,0.601),(-0.088,0.596),(-0.087,0.591),(-0.086,0.586),(-0.085\
+		,0.581),(-0.084,0.576),(-0.083,0.571),(-0.082,0.566),(-0.081,0.561),(-0.08,0.556),(\
+		-0.079,0.551),(-0.078,0.546),(-0.077,0.541),(-0.076,0.535),(-0.075,0.53),(-0.074,0.525\
+		),(-0.073,0.519),(-0.072,0.514),(-0.071,0.508),(-0.07,0.503),(-0.069,0.497),(-0.068\
+		,0.492),(-0.067,0.486),(-0.066,0.48),(-0.065,0.475),(-0.064,0.469),(-0.063,0.463),(\
+		-0.062,0.457),(-0.061,0.451),(-0.06,0.445),(-0.059,0.439),(-0.058,0.433),(-0.057,0.427\
+		),(-0.056,0.421),(-0.055,0.415),(-0.054,0.409),(-0.053,0.402),(-0.052,0.396),(-0.051\
+		,0.39),(-0.05,0.383),(-0.049,0.377),(-0.048,0.37),(-0.047,0.364),(-0.046,0.357),(-0.045\
+		,0.35),(-0.044,0.344),(-0.043,0.337),(-0.042,0.33),(-0.041,0.323),(-0.04,0.317),(-0.039\
+		,0.31),(-0.038,0.303),(-0.037,0.296),(-0.036,0.288),(-0.035,0.281),(-0.034,0.274),(\
+		-0.033,0.267),(-0.032,0.26),(-0.031,0.252),(-0.03,0.245),(-0.029,0.238),(-0.028,0.23\
+		),(-0.027,0.223),(-0.026,0.215),(-0.025,0.207),(-0.024,0.2),(-0.023,0.192),(-0.022,\
+		0.184),(-0.021,0.176),(-0.02,0.169),(-0.019,0.161),(-0.018,0.153),(-0.017,0.145),(-\
+		0.016,0.137),(-0.015,0.128),(-0.014,0.12),(-0.013,0.112),(-0.012,0.104),(-0.011,0.095\
+		),(-0.01,0.087),(-0.009,0.078),(-0.008,0.07),(-0.007,0.061),(-0.006,0.053),(-0.005,\
+		0.044),(-0.004,0.035),(-0.003,0.027),(-0.002,0.018),(-0.001,0.009),(0,0),(0.001,0),\
+		(0.002,0),(0.003,0),(0.004,0),(0.005,0))
+	~	Dmnl
+	~		|
+
+GUB less Perceived bike availability factor at Y=
+	MIN(0, Goal for upper bound for bike availability or GUB at Y - Perceived bike availability factor at Y\
+		)
+	~	Dmnl
+	~		|
+
+Table for UPoA as a function of bike availability at Y(
+	[(0,0.9)-(1,1.08)],(0,0.93),(0.01,0.935),(0.02,0.941),(0.03,0.945),(0.04,0.95),(0.05\
+		,0.955),(0.06,0.959),(0.07,0.963),(0.08,0.967),(0.09,0.97),(0.1,0.974),(0.11,0.977)\
+		,(0.12,0.98),(0.13,0.983),(0.14,0.986),(0.15,0.988),(0.16,0.99),(0.17,0.993),(0.18,\
+		0.995),(0.19,0.996),(0.2,0.998),(0.21,1),(0.22,1),(0.23,1),(0.24,1),(0.25,1),(0.26,\
+		1),(0.27,1),(0.28,1),(0.29,1),(0.3,1),(0.31,1),(0.32,1),(0.33,1),(0.34,1),(0.35,1),\
+		(0.36,1),(0.37,1),(0.38,1),(0.39,1),(0.4,1),(0.41,1),(0.42,1),(0.43,1),(0.44,1),(0.45\
+		,1),(0.46,1),(0.47,1),(0.48,1),(0.49,1),(0.5,1),(0.51,1),(0.52,1),(0.53,1),(0.54,1)\
+		,(0.55,1),(0.56,1),(0.57,1),(0.58,1),(0.59,1),(0.6,1),(0.61,1),(0.62,1),(0.63,1),(0.64\
+		,1),(0.65,1),(0.66,1),(0.67,1),(0.68,1),(0.69,1),(0.7,1),(0.71,1),(0.72,1.001),(0.73\
+		,1.002),(0.74,1.003),(0.75,1.004),(0.76,1.005),(0.77,1.006),(0.78,1.007),(0.79,1.009\
+		),(0.8,1.01),(0.81,1.012),(0.82,1.014),(0.83,1.016),(0.84,1.018),(0.85,1.021),(0.86\
+		,1.023),(0.87,1.026),(0.88,1.029),(0.89,1.032),(0.9,1.035),(0.91,1.039),(0.92,1.043\
+		),(0.93,1.047),(0.94,1.051),(0.95,1.055),(0.96,1.06),(0.97,1.064),(0.98,1.069),(0.99\
+		,1.075),(1,1.08))
+	~	Dmnl
+	~		|
+
+LOOKUP projected bike availability factor at Y(
+	[(0,0)-(144,0.3)],(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0)\
+		,(11,0),(12,0),(13,0),(14,0),(15,0),(16,0),(17,0),(18,0),(19,0),(20,0),(21,0),(22,0\
+		),(23,0),(24,0),(25,0),(26,0),(27,0),(28,0),(29,0),(30,0),(31,0),(32,0),(33,0),(34,\
+		0),(35,0),(36,0),(37,0),(38,0),(39,0),(40,0),(41,0.002),(42,0.003),(43,0.005),(44,0.008\
+		),(45,0.012),(46,0.017),(47,0.023),(48,0.032),(49,0.043),(50,0.057),(51,0.075),(52,\
+		0.095),(53,0.115),(54,0.137),(55,0.157),(56,0.175),(57,0.19),(58,0.203),(59,0.215),\
+		(60,0.225),(61,0.233),(62,0.242),(63,0.248),(64,0.253),(65,0.257),(66,0.258),(67,0.26\
+		),(68,0.26),(69,0.262),(70,0.263),(71,0.265),(72,0.267),(73,0.27),(74,0.273),(75,0.275\
+		),(76,0.277),(77,0.278),(78,0.278),(79,0.277),(80,0.273),(81,0.268),(82,0.263),(83,\
+		0.257),(84,0.25),(85,0.242),(86,0.233),(87,0.225),(88,0.215),(89,0.207),(90,0.198),\
+		(91,0.19),(92,0.183),(93,0.177),(94,0.17),(95,0.162),(96,0.153),(97,0.147),(98,0.138\
+		),(99,0.13),(100,0.122),(101,0.115),(102,0.108),(103,0.1),(104,0.093),(105,0.087),(\
+		106,0.082),(107,0.075),(108,0.07),(109,0.068),(110,0.067),(111,0.068),(112,0.072),(\
+		113,0.077),(114,0.083),(115,0.088),(116,0.095),(117,0.1),(118,0.105),(119,0.11),(120\
+		,0.115),(121,0.12),(122,0.123),(123,0.127),(124,0.128),(125,0.13),(126,0.128),(127,\
+		0.125),(128,0.12),(129,0.113),(130,0.105),(131,0.097),(132,0.088),(133,0.08),(134,0.072\
+		),(135,0.063),(136,0.057),(137,0.048),(138,0.042),(139,0.035),(140,0.035),(141,0.035\
+		),(142,0.035),(143,0.035),(144,0.035))
+	~	Dmnl
+	~		|
+
+Table for UPoA as a function of dock availability at Y(
+	[(0,0.9)-(1,1.05)],(0,0.95),(0.01,0.954),(0.02,0.958),(0.03,0.962),(0.04,0.965),(0.05\
+		,0.969),(0.06,0.972),(0.07,0.975),(0.08,0.978),(0.09,0.981),(0.1,0.983),(0.11,0.986\
+		),(0.12,0.988),(0.13,0.99),(0.14,0.992),(0.15,0.994),(0.16,0.996),(0.17,0.998),(0.18\
+		,0.999),(0.19,1),(0.2,1),(0.21,1),(0.22,1),(0.23,1),(0.24,1),(0.25,1),(0.26,1),(0.27\
+		,1),(0.28,1),(0.29,1),(0.3,1),(0.31,1),(0.32,1),(0.33,1),(0.34,1),(0.35,1),(0.36,1)\
+		,(0.37,1),(0.38,1),(0.39,1),(0.4,1),(0.41,1),(0.42,1),(0.43,1),(0.44,1),(0.45,1),(0.46\
+		,1),(0.47,1),(0.48,1),(0.49,1),(0.5,1),(0.51,1),(0.52,1),(0.53,1),(0.54,1),(0.55,1)\
+		,(0.56,1),(0.57,1),(0.58,1),(0.59,1),(0.6,1),(0.61,1),(0.62,1),(0.63,1),(0.64,1),(0.65\
+		,1),(0.66,1),(0.67,1),(0.68,1),(0.69,1),(0.7,1),(0.71,1),(0.72,1),(0.73,1),(0.74,1)\
+		,(0.75,1),(0.76,1),(0.77,1),(0.78,1.001),(0.79,1.002),(0.8,1.003),(0.81,1.004),(0.82\
+		,1.005),(0.83,1.007),(0.84,1.008),(0.85,1.01),(0.86,1.011),(0.87,1.013),(0.88,1.015\
+		),(0.89,1.017),(0.9,1.019),(0.91,1.022),(0.92,1.024),(0.93,1.027),(0.94,1.03),(0.95\
+		,1.033),(0.96,1.036),(0.97,1.039),(0.98,1.043),(0.99,1.046),(1,1.05))
+	~	Dmnl
+	~		|
+
+Out of stock risk due to dock unavailability at Y=
+	"Table for OOS risk as a function of GUB - Bike availability factor at Y"(QUANTUM(GUB less Perceived bike availability factor at Y\
+		, 0.001))
+	~	Dmnl
+	~		|
+
+Simulated normal return rate at Y=
+	LOOKUP return rate at Y(Time*"1/Minute")
+	~	Bikes/Minute
+	~		|
+
+Use attractiveness quotient at Y=
+	1
+	~	Dmnl [0,1,1]
+	~		|
+
+User perception of attractiveness for rentals at Y=
+	Table for UPoA as a function of bike availability at Y(Bike availability factor at Y\
+		)
+	~	Dmnl
+	~		|
+
+Perceived bike availability factor less GLB at Y=
+	MIN(0, Perceived bike availability factor at Y - Goal for lower bound for bike availability or GLB at Y\
+		)
+	~	Dmnl
+	~		|
+
+Cumulated return rate adjustments= INTEG (
+	Adjustments to simulated return rate,
+		0)
+	~	Bikes
+	~		|
+
+Adjustments to simulated rental rate=
+	ABS(Rental rate - Simulated normal rental rate)
+	~	Bikes/Minute
+	~		|
+
+Adjustments to simulated return rate=
+	ABS(Return rate - Simulated normal return rate)
+	~	Bikes/Minute
+	~		|
+
+Cumulated rental rate adjustments= INTEG (
+	Adjustments to simulated rental rate,
+		0)
+	~	Bikes
+	~		|
+
+Simulated normal rental rate=
+	LOOKUP rental rate(Time*"1/Minute")
+	~	Bikes/Minute
+	~		|
+
+Perceived bike availability factor less GLB=
+	MIN(0, Perceived bike availability factor - Goal for lower bound for bike availability or GLB\
+		)
+	~	Dmnl
+	~		|
+
+GUB less Perceived bike availability factor=
+	MIN(0, Goal for upper bound for bike availability or GUB - Perceived bike availability factor\
+		)
+	~	Dmnl
+	~		|
+
+LOOKUP projected bike availability factor(
+	[(0,0)-(144,0.7)],(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0)\
+		,(11,0),(12,0),(13,0),(14,0),(15,0),(16,0),(17,0),(18,0),(19,0),(20,0),(21,0),(22,0\
+		),(23,0),(24,0),(25,0),(26,0),(27,0),(28,0.002),(29,0.003),(30,0.005),(31,0.007),(32\
+		,0.008),(33,0.01),(34,0.01),(35,0.012),(36,0.013),(37,0.015),(38,0.018),(39,0.022),\
+		(40,0.025),(41,0.027),(42,0.03),(43,0.033),(44,0.037),(45,0.042),(46,0.052),(47,0.067\
+		),(48,0.088),(49,0.12),(50,0.16),(51,0.207),(52,0.257),(53,0.308),(54,0.355),(55,0.398\
+		),(56,0.437),(57,0.472),(58,0.5),(59,0.525),(60,0.548),(61,0.567),(62,0.58),(63,0.59\
+		),(64,0.598),(65,0.603),(66,0.607),(67,0.608),(68,0.61),(69,0.612),(70,0.615),(71,0.622\
+		),(72,0.63),(73,0.642),(74,0.655),(75,0.667),(76,0.675),(77,0.678),(78,0.68),(79,0.677\
+		),(80,0.67),(81,0.662),(82,0.653),(83,0.645),(84,0.635),(85,0.625),(86,0.615),(87,0.605\
+		),(88,0.593),(89,0.582),(90,0.568),(91,0.555),(92,0.54),(93,0.525),(94,0.51),(95,0.493\
+		),(96,0.475),(97,0.455),(98,0.435),(99,0.415),(100,0.398),(101,0.385),(102,0.377),(\
+		103,0.37),(104,0.363),(105,0.353),(106,0.338),(107,0.317),(108,0.29),(109,0.258),(110\
+		,0.227),(111,0.198),(112,0.173),(113,0.153),(114,0.137),(115,0.125),(116,0.117),(117\
+		,0.108),(118,0.102),(119,0.097),(120,0.093),(121,0.092),(122,0.09),(123,0.088),(124\
+		,0.085),(125,0.082),(126,0.075),(127,0.067),(128,0.057),(129,0.047),(130,0.037),(131\
+		,0.025),(132,0.017),(133,0.01),(134,0.005),(135,0.002),(136,0),(137,0),(138,0),(139\
+		,0),(140,0),(141,0),(142,0),(143,0),(144,0))
+	~	Dmnl
+	~		|
+
+LOOKUP rental rate(
+	[(0,0)-(144,8)],(0,0),(1,1),(2,0),(3,0),(4,0),(5,0),(6,0),(7,1),(8,0),(9,0),(10,0),(\
+		11,0),(12,0),(13,0),(14,0),(15,0),(16,0),(17,0),(18,0),(19,0),(20,0),(21,0),(22,0),\
+		(23,0),(24,0),(25,0),(26,0),(27,0),(28,0),(29,0),(30,0),(31,0),(32,0),(33,1),(34,0)\
+		,(35,1),(36,0),(37,0),(38,0),(39,0),(40,0),(41,1),(42,1),(43,1),(44,2),(45,0),(46,1\
+		),(47,1),(48,0),(49,1),(50,3),(51,0),(52,1),(53,3),(54,2),(55,2),(56,2),(57,2),(58,\
+		2),(59,1),(60,2),(61,2),(62,2),(63,1),(64,2),(65,1),(66,2),(67,2),(68,4),(69,1),(70\
+		,4),(71,3),(72,3),(73,2),(74,3),(75,2),(76,3),(77,2),(78,2),(79,3),(80,3),(81,3),(82\
+		,3),(83,3),(84,3),(85,3),(86,3),(87,3),(88,3),(89,0),(90,2),(91,3),(92,3),(93,3),(94\
+		,3),(95,2),(96,3),(97,4),(98,4),(99,4),(100,4),(101,4),(102,4),(103,4),(104,4),(105\
+		,4),(106,5),(107,3),(108,5),(109,6),(110,3),(111,8),(112,2),(113,1),(114,4),(115,4)\
+		,(116,3),(117,3),(118,2),(119,2),(120,2),(121,3),(122,0),(123,3),(124,1),(125,2),(126\
+		,1),(127,1),(128,1),(129,1),(130,1),(131,0),(132,1),(133,1),(134,1),(135,1),(136,1)\
+		,(137,0),(138,0),(139,1),(140,0),(141,0),(142,1),(143,0),(144,0))
+	~	Bikes/Minute
+	~		|
+
+LOOKUP return rate(
+	[(0,0)-(144,8)],(0,0),(1,1),(2,0),(3,0),(4,0),(5,1),(6,0),(7,0),(8,0),(9,0),(10,0),(\
+		11,0),(12,0),(13,0),(14,0),(15,0),(16,0),(17,0),(18,0),(19,0),(20,0),(21,0),(22,0),\
+		(23,0),(24,0),(25,0),(26,0),(27,0),(28,0),(29,0),(30,0),(31,0),(32,0),(33,0),(34,0)\
+		,(35,0),(36,0),(37,0),(38,0),(39,0),(40,0),(41,1),(42,0),(43,0),(44,0),(45,0),(46,0\
+		),(47,0),(48,1),(49,0),(50,1),(51,0),(52,1),(53,2),(54,1),(55,1),(56,1),(57,1),(58,\
+		1),(59,1),(60,1),(61,4),(62,3),(63,3),(64,3),(65,4),(66,6),(67,3),(68,4),(69,3),(70\
+		,5),(71,0),(72,3),(73,3),(74,1),(75,3),(76,3),(77,3),(78,4),(79,4),(80,4),(81,3),(82\
+		,4),(83,3),(84,4),(85,5),(86,1),(87,1),(88,3),(89,1),(90,3),(91,3),(92,3),(93,3),(94\
+		,3),(95,4),(96,3),(97,4),(98,3),(99,3),(100,3),(101,4),(102,4),(103,4),(104,1),(105\
+		,5),(106,4),(107,4),(108,5),(109,3),(110,8),(111,4),(112,3),(113,3),(114,4),(115,4)\
+		,(116,3),(117,3),(118,3),(119,3),(120,0),(121,0),(122,3),(123,1),(124,0),(125,1),(126\
+		,0),(127,0),(128,1),(129,0),(130,3),(131,1),(132,3),(133,1),(134,1),(135,0),(136,0)\
+		,(137,0),(138,0),(139,0),(140,0),(141,3),(142,0),(143,0),(144,0))
+	~	Bikes/Minute
+	~		|
+
+Projected bike availability factor=
+	LOOKUP projected bike availability factor(Time*"1/Minute")
+	~	Dmnl
+	~		|
+
+Discrepancy to projected=
+	Projected bike availability factor - Perceived bike availability factor
+	~	Dmnl
+	~		|
+
+Simulated normal return rate=
+	LOOKUP return rate(Time*"1/Minute")
+	~	Bikes/Minute
+	~		|
+
+Responsiveness to actual=
+	6
+	~	Minute [3,72,3]
+	~		|
+
+Out of stock risk due to bike unavailability=
+	"Table for OOS risk as a function of Bike availability factor - GLB"(QUANTUM(Perceived bike availability factor less GLB\
+		, 0.001))
+	~	Dmnl
+	~		|
+
+Out of stock risk due to dock unavailability=
+	"Table for OOS risk as a function of GUB - Bike availability factor"(QUANTUM(GUB less Perceived bike availability factor\
+		, 0.001))
+	~	Dmnl
+	~		|
+
+Perception of risk of OOS due to bike unavailability= INTEG (
+	Perception of returns risk update,
+		0.5)
+	~	Dmnl
+	~		|
+
+Perception or rentals risk update=
+	(Out of stock risk due to dock unavailability - Perception of risk of OOS due to dock unavailability\
+		)/Perception delay
+	~	Dmnl/Minute
+	~		|
+
+Pressure threshold for incentive authorization=
+	0.8
+	~	Dmnl [0.5,1,0.01]
+	~		|
+
+Goal for lower bound for bike availability or GLB=
+	0.3
+	~	Dmnl [0.1,0.5,0.01]
+	~		|
+
+Goal for upper bound for bike availability or GUB=
+	0.7
+	~	Dmnl [0.5,0.9,0.01]
+	~		|
+
+Perception of risk of OOS due to dock unavailability= INTEG (
+	Perception or rentals risk update,
+		0)
+	~	Dmnl
+	~		|
+
+Rental rate=
+	MIN(Cluster yin bike stock * "1/Minute", Simulated normal rental rate + Change to rentals rate due to UPoA\
+		 + Change to rentals rate due to incentives)
+	~	Bikes/Minute
+	~		|
+
+"Table for OOS risk as a function of GUB - Bike availability factor"(
+	[(-0.3,0)-(0.01,1)],(-0.3,1),(-0.299,1),(-0.298,0.999),(-0.297,0.999),(-0.296,0.999)\
+		,(-0.295,0.998),(-0.294,0.998),(-0.293,0.998),(-0.292,0.997),(-0.291,0.997),(-0.29,\
+		0.997),(-0.289,0.996),(-0.288,0.996),(-0.287,0.995),(-0.286,0.995),(-0.285,0.995),(\
+		-0.284,0.994),(-0.283,0.994),(-0.282,0.994),(-0.281,0.993),(-0.28,0.993),(-0.279,0.992\
+		),(-0.278,0.992),(-0.277,0.991),(-0.276,0.991),(-0.275,0.991),(-0.274,0.99),(-0.273\
+		,0.99),(-0.272,0.989),(-0.271,0.989),(-0.27,0.988),(-0.269,0.988),(-0.268,0.987),(-\
+		0.267,0.987),(-0.266,0.986),(-0.265,0.986),(-0.264,0.985),(-0.263,0.985),(-0.262,0.984\
+		),(-0.261,0.984),(-0.26,0.983),(-0.259,0.983),(-0.258,0.982),(-0.257,0.981),(-0.256\
+		,0.981),(-0.255,0.98),(-0.254,0.98),(-0.253,0.979),(-0.252,0.978),(-0.251,0.978),(-\
+		0.25,0.977),(-0.249,0.976),(-0.248,0.976),(-0.247,0.975),(-0.246,0.974),(-0.245,0.973\
+		),(-0.244,0.973),(-0.243,0.972),(-0.242,0.971),(-0.241,0.97),(-0.24,0.97),(-0.239,0.969\
+		),(-0.238,0.968),(-0.237,0.967),(-0.236,0.966),(-0.235,0.965),(-0.234,0.965),(-0.233\
+		,0.964),(-0.232,0.963),(-0.231,0.962),(-0.23,0.961),(-0.229,0.96),(-0.228,0.959),(-\
+		0.227,0.958),(-0.226,0.957),(-0.225,0.956),(-0.224,0.955),(-0.223,0.954),(-0.222,0.953\
+		),(-0.221,0.952),(-0.22,0.951),(-0.219,0.95),(-0.218,0.949),(-0.217,0.948),(-0.216,\
+		0.946),(-0.215,0.945),(-0.214,0.944),(-0.213,0.943),(-0.212,0.942),(-0.211,0.94),(-\
+		0.21,0.939),(-0.209,0.938),(-0.208,0.937),(-0.207,0.935),(-0.206,0.934),(-0.205,0.933\
+		),(-0.204,0.931),(-0.203,0.93),(-0.202,0.928),(-0.201,0.927),(-0.2,0.926),(-0.199,0.924\
+		),(-0.198,0.923),(-0.197,0.921),(-0.196,0.92),(-0.195,0.918),(-0.194,0.916),(-0.193\
+		,0.915),(-0.192,0.913),(-0.191,0.912),(-0.19,0.91),(-0.189,0.908),(-0.188,0.907),(-\
+		0.187,0.905),(-0.186,0.903),(-0.185,0.901),(-0.184,0.9),(-0.183,0.898),(-0.182,0.896\
+		),(-0.181,0.894),(-0.18,0.892),(-0.179,0.89),(-0.178,0.888),(-0.177,0.886),(-0.176,\
+		0.884),(-0.175,0.882),(-0.174,0.88),(-0.173,0.878),(-0.172,0.876),(-0.171,0.874),(-\
+		0.17,0.872),(-0.169,0.87),(-0.168,0.868),(-0.167,0.866),(-0.166,0.863),(-0.165,0.861\
+		),(-0.164,0.859),(-0.163,0.857),(-0.162,0.854),(-0.161,0.852),(-0.16,0.849),(-0.159\
+		,0.847),(-0.158,0.845),(-0.157,0.842),(-0.156,0.84),(-0.155,0.837),(-0.154,0.835),(\
+		-0.153,0.832),(-0.152,0.829),(-0.151,0.827),(-0.15,0.824),(-0.149,0.821),(-0.148,0.819\
+		),(-0.147,0.816),(-0.146,0.813),(-0.145,0.81),(-0.144,0.807),(-0.143,0.805),(-0.142\
+		,0.802),(-0.141,0.799),(-0.14,0.796),(-0.139,0.793),(-0.138,0.79),(-0.137,0.787),(-\
+		0.136,0.784),(-0.135,0.781),(-0.134,0.777),(-0.133,0.774),(-0.132,0.771),(-0.131,0.768\
+		),(-0.13,0.765),(-0.129,0.761),(-0.128,0.758),(-0.127,0.755),(-0.126,0.751),(-0.125\
+		,0.748),(-0.124,0.744),(-0.123,0.741),(-0.122,0.737),(-0.121,0.734),(-0.12,0.73),(-\
+		0.119,0.726),(-0.118,0.723),(-0.117,0.719),(-0.116,0.715),(-0.115,0.711),(-0.114,0.708\
+		),(-0.113,0.704),(-0.112,0.7),(-0.111,0.696),(-0.11,0.692),(-0.109,0.688),(-0.108,0.684\
+		),(-0.107,0.68),(-0.106,0.676),(-0.105,0.672),(-0.104,0.668),(-0.103,0.663),(-0.102\
+		,0.659),(-0.101,0.655),(-0.1,0.651),(-0.099,0.646),(-0.098,0.642),(-0.097,0.637),(-\
+		0.096,0.633),(-0.095,0.628),(-0.094,0.624),(-0.093,0.619),(-0.092,0.615),(-0.091,0.61\
+		),(-0.09,0.605),(-0.089,0.601),(-0.088,0.596),(-0.087,0.591),(-0.086,0.586),(-0.085\
+		,0.581),(-0.084,0.576),(-0.083,0.571),(-0.082,0.566),(-0.081,0.561),(-0.08,0.556),(\
+		-0.079,0.551),(-0.078,0.546),(-0.077,0.541),(-0.076,0.535),(-0.075,0.53),(-0.074,0.525\
+		),(-0.073,0.519),(-0.072,0.514),(-0.071,0.508),(-0.07,0.503),(-0.069,0.497),(-0.068\
+		,0.492),(-0.067,0.486),(-0.066,0.48),(-0.065,0.475),(-0.064,0.469),(-0.063,0.463),(\
+		-0.062,0.457),(-0.061,0.451),(-0.06,0.445),(-0.059,0.439),(-0.058,0.433),(-0.057,0.427\
+		),(-0.056,0.421),(-0.055,0.415),(-0.054,0.409),(-0.053,0.402),(-0.052,0.396),(-0.051\
+		,0.39),(-0.05,0.383),(-0.049,0.377),(-0.048,0.37),(-0.047,0.364),(-0.046,0.357),(-0.045\
+		,0.35),(-0.044,0.344),(-0.043,0.337),(-0.042,0.33),(-0.041,0.323),(-0.04,0.317),(-0.039\
+		,0.31),(-0.038,0.303),(-0.037,0.296),(-0.036,0.288),(-0.035,0.281),(-0.034,0.274),(\
+		-0.033,0.267),(-0.032,0.26),(-0.031,0.252),(-0.03,0.245),(-0.029,0.238),(-0.028,0.23\
+		),(-0.027,0.223),(-0.026,0.215),(-0.025,0.207),(-0.024,0.2),(-0.023,0.192),(-0.022,\
+		0.184),(-0.021,0.176),(-0.02,0.169),(-0.019,0.161),(-0.018,0.153),(-0.017,0.145),(-\
+		0.016,0.137),(-0.015,0.128),(-0.014,0.12),(-0.013,0.112),(-0.012,0.104),(-0.011,0.095\
+		),(-0.01,0.087),(-0.009,0.078),(-0.008,0.07),(-0.007,0.061),(-0.006,0.053),(-0.005,\
+		0.044),(-0.004,0.035),(-0.003,0.027),(-0.002,0.018),(-0.001,0.009),(0,0),(0.001,0),\
+		(0.002,0),(0.003,0),(0.004,0),(0.005,0))
+	~	Dmnl
+	~		|
+
+Perception of returns risk update=
+	(Out of stock risk due to bike unavailability - Perception of risk of OOS due to bike unavailability\
+		)/Perception delay
+	~	Dmnl/Minute
+	~		|
+
+Perception delay=
+	3
+	~	Minute [3,12,3]
+	~		|
+
+Return rate=
+	MIN((Cluster capacity - Cluster yin bike stock) * "1/Minute", Simulated normal return rate\
+		 + Change to returns rate due to UPoA + Change to returns rate due to incentives)
+	~	Bikes/Minute
+	~		|
+
+Use incentives=
+	1
+	~	Dmnl [0,1,1]
+	~		|
+
+"Table for OOS risk as a function of Bike availability factor - GLB"(
+	[(-0.3,0)-(0.01,1)],(-0.3,1),(-0.299,1),(-0.298,1),(-0.297,1),(-0.296,1),(-0.295,1),\
+		(-0.294,1),(-0.293,1),(-0.292,1),(-0.291,1),(-0.29,1),(-0.289,0.999),(-0.288,0.999)\
+		,(-0.287,0.999),(-0.286,0.999),(-0.285,0.999),(-0.284,0.999),(-0.283,0.999),(-0.282\
+		,0.999),(-0.281,0.999),(-0.28,0.999),(-0.279,0.999),(-0.278,0.999),(-0.277,0.999),(\
+		-0.276,0.999),(-0.275,0.998),(-0.274,0.998),(-0.273,0.998),(-0.272,0.998),(-0.271,0.998\
+		),(-0.27,0.998),(-0.269,0.998),(-0.268,0.997),(-0.267,0.997),(-0.266,0.997),(-0.265\
+		,0.997),(-0.264,0.997),(-0.263,0.997),(-0.262,0.996),(-0.261,0.996),(-0.26,0.996),(\
+		-0.259,0.996),(-0.258,0.996),(-0.257,0.995),(-0.256,0.995),(-0.255,0.995),(-0.254,0.995\
+		),(-0.253,0.994),(-0.252,0.994),(-0.251,0.994),(-0.25,0.993),(-0.249,0.993),(-0.248\
+		,0.993),(-0.247,0.992),(-0.246,0.992),(-0.245,0.992),(-0.244,0.991),(-0.243,0.991),\
+		(-0.242,0.991),(-0.241,0.99),(-0.24,0.99),(-0.239,0.989),(-0.238,0.989),(-0.237,0.988\
+		),(-0.236,0.988),(-0.235,0.987),(-0.234,0.987),(-0.233,0.986),(-0.232,0.986),(-0.231\
+		,0.985),(-0.23,0.985),(-0.229,0.984),(-0.228,0.983),(-0.227,0.983),(-0.226,0.982),(\
+		-0.225,0.982),(-0.224,0.981),(-0.223,0.98),(-0.222,0.98),(-0.221,0.979),(-0.22,0.978\
+		),(-0.219,0.977),(-0.218,0.977),(-0.217,0.976),(-0.216,0.975),(-0.215,0.974),(-0.214\
+		,0.973),(-0.213,0.972),(-0.212,0.972),(-0.211,0.971),(-0.21,0.97),(-0.209,0.969),(-\
+		0.208,0.968),(-0.207,0.967),(-0.206,0.966),(-0.205,0.965),(-0.204,0.964),(-0.203,0.963\
+		),(-0.202,0.962),(-0.201,0.961),(-0.2,0.959),(-0.199,0.958),(-0.198,0.957),(-0.197,\
+		0.956),(-0.196,0.955),(-0.195,0.954),(-0.194,0.952),(-0.193,0.951),(-0.192,0.95),(-\
+		0.191,0.948),(-0.19,0.947),(-0.189,0.946),(-0.188,0.944),(-0.187,0.943),(-0.186,0.941\
+		),(-0.185,0.94),(-0.184,0.938),(-0.183,0.937),(-0.182,0.935),(-0.181,0.934),(-0.18,\
+		0.932),(-0.179,0.93),(-0.178,0.929),(-0.177,0.927),(-0.176,0.925),(-0.175,0.924),(-\
+		0.174,0.922),(-0.173,0.92),(-0.172,0.918),(-0.171,0.916),(-0.17,0.915),(-0.169,0.913\
+		),(-0.168,0.911),(-0.167,0.909),(-0.166,0.907),(-0.165,0.905),(-0.164,0.903),(-0.163\
+		,0.901),(-0.162,0.898),(-0.161,0.896),(-0.16,0.894),(-0.159,0.892),(-0.158,0.89),(-\
+		0.157,0.887),(-0.156,0.885),(-0.155,0.883),(-0.154,0.88),(-0.153,0.878),(-0.152,0.876\
+		),(-0.151,0.873),(-0.15,0.871),(-0.149,0.868),(-0.148,0.866),(-0.147,0.863),(-0.146\
+		,0.86),(-0.145,0.858),(-0.144,0.855),(-0.143,0.852),(-0.142,0.85),(-0.141,0.847),(-\
+		0.14,0.844),(-0.139,0.841),(-0.138,0.838),(-0.137,0.835),(-0.136,0.832),(-0.135,0.829\
+		),(-0.134,0.826),(-0.133,0.823),(-0.132,0.82),(-0.131,0.817),(-0.13,0.814),(-0.129,\
+		0.81),(-0.128,0.807),(-0.127,0.804),(-0.126,0.8),(-0.125,0.797),(-0.124,0.794),(-0.123\
+		,0.79),(-0.122,0.787),(-0.121,0.783),(-0.12,0.78),(-0.119,0.776),(-0.118,0.772),(-0.117\
+		,0.769),(-0.116,0.765),(-0.115,0.761),(-0.114,0.757),(-0.113,0.753),(-0.112,0.75),(\
+		-0.111,0.746),(-0.11,0.742),(-0.109,0.738),(-0.108,0.734),(-0.107,0.729),(-0.106,0.725\
+		),(-0.105,0.721),(-0.104,0.717),(-0.103,0.713),(-0.102,0.708),(-0.101,0.704),(-0.1,\
+		0.7),(-0.099,0.695),(-0.098,0.691),(-0.097,0.686),(-0.096,0.681),(-0.095,0.677),(-0.094\
+		,0.672),(-0.093,0.667),(-0.092,0.663),(-0.091,0.658),(-0.09,0.653),(-0.089,0.648),(\
+		-0.088,0.643),(-0.087,0.638),(-0.086,0.633),(-0.085,0.628),(-0.084,0.623),(-0.083,0.618\
+		),(-0.082,0.612),(-0.081,0.607),(-0.08,0.602),(-0.079,0.596),(-0.078,0.591),(-0.077\
+		,0.586),(-0.076,0.58),(-0.075,0.574),(-0.074,0.569),(-0.073,0.563),(-0.072,0.557),(\
+		-0.071,0.552),(-0.07,0.546),(-0.069,0.54),(-0.068,0.534),(-0.067,0.528),(-0.066,0.522\
+		),(-0.065,0.516),(-0.064,0.51),(-0.063,0.504),(-0.062,0.497),(-0.061,0.491),(-0.06,\
+		0.485),(-0.059,0.478),(-0.058,0.472),(-0.057,0.465),(-0.056,0.459),(-0.055,0.452),(\
+		-0.054,0.446),(-0.053,0.439),(-0.052,0.432),(-0.051,0.425),(-0.05,0.418),(-0.049,0.412\
+		),(-0.048,0.405),(-0.047,0.397),(-0.046,0.39),(-0.045,0.383),(-0.044,0.376),(-0.043\
+		,0.369),(-0.042,0.361),(-0.041,0.354),(-0.04,0.347),(-0.039,0.339),(-0.038,0.332),(\
+		-0.037,0.324),(-0.036,0.316),(-0.035,0.309),(-0.034,0.301),(-0.033,0.293),(-0.032,0.285\
+		),(-0.031,0.277),(-0.03,0.269),(-0.029,0.261),(-0.028,0.253),(-0.027,0.245),(-0.026\
+		,0.236),(-0.025,0.228),(-0.024,0.22),(-0.023,0.211),(-0.022,0.203),(-0.021,0.194),(\
+		-0.02,0.186),(-0.019,0.177),(-0.018,0.168),(-0.017,0.159),(-0.016,0.151),(-0.015,0.142\
+		),(-0.014,0.133),(-0.013,0.124),(-0.012,0.114),(-0.011,0.105),(-0.01,0.096),(-0.009\
+		,0.087),(-0.008,0.077),(-0.007,0.068),(-0.006,0.058),(-0.005,0.049),(-0.004,0.039),\
+		(-0.003,0.029),(-0.002,0.02),(-0.001,0.01),(0,0),(0.001,0),(0.002,0),(0.003,0),(0.004\
+		,0),(0.005,0))
+	~	Dmnl
+	~		|
+
+"1/Minute"=
+	1
+	~	1/Minute
+	~		|
+
+Change to rentals rate due to UPoA=
+	Simulated normal rental rate * ((User perception of attractiveness for rentals - 1) \
+		* Use attractiveness quotient)
+	~	Bikes/Minute
+	~		|
+
+Change to returns rate due to UPoA=
+	Simulated normal return rate * ((User perception of attractiveness for returns - 1) \
+		* Use attractiveness quotient)
+	~	Bikes/Minute
+	~		|
+
+Use attractiveness quotient=
+	1
+	~	Dmnl [0,1,1]
+	~		|
+
+Table for UPoA as a function of bike availability(
+	[(0,0.9)-(1,1.08)],(0,0.93),(0.01,0.935),(0.02,0.941),(0.03,0.945),(0.04,0.95),(0.05\
+		,0.955),(0.06,0.959),(0.07,0.963),(0.08,0.967),(0.09,0.97),(0.1,0.974),(0.11,0.977)\
+		,(0.12,0.98),(0.13,0.983),(0.14,0.986),(0.15,0.988),(0.16,0.99),(0.17,0.993),(0.18,\
+		0.995),(0.19,0.996),(0.2,0.998),(0.21,1),(0.22,1),(0.23,1),(0.24,1),(0.25,1),(0.26,\
+		1),(0.27,1),(0.28,1),(0.29,1),(0.3,1),(0.31,1),(0.32,1),(0.33,1),(0.34,1),(0.35,1),\
+		(0.36,1),(0.37,1),(0.38,1),(0.39,1),(0.4,1),(0.41,1),(0.42,1),(0.43,1),(0.44,1),(0.45\
+		,1),(0.46,1),(0.47,1),(0.48,1),(0.49,1),(0.5,1),(0.51,1),(0.52,1),(0.53,1),(0.54,1)\
+		,(0.55,1),(0.56,1),(0.57,1),(0.58,1),(0.59,1),(0.6,1),(0.61,1),(0.62,1),(0.63,1),(0.64\
+		,1),(0.65,1),(0.66,1),(0.67,1),(0.68,1),(0.69,1),(0.7,1),(0.71,1),(0.72,1.001),(0.73\
+		,1.002),(0.74,1.003),(0.75,1.004),(0.76,1.005),(0.77,1.006),(0.78,1.007),(0.79,1.009\
+		),(0.8,1.01),(0.81,1.012),(0.82,1.014),(0.83,1.016),(0.84,1.018),(0.85,1.021),(0.86\
+		,1.023),(0.87,1.026),(0.88,1.029),(0.89,1.032),(0.9,1.035),(0.91,1.039),(0.92,1.043\
+		),(0.93,1.047),(0.94,1.051),(0.95,1.055),(0.96,1.06),(0.97,1.064),(0.98,1.069),(0.99\
+		,1.075),(1,1.08))
+	~	Dmnl
+	~		|
+
+Table for UPoA as a function of dock availability(
+	[(0,0.9)-(1,1.05)],(0,0.95),(0.01,0.954),(0.02,0.958),(0.03,0.962),(0.04,0.965),(0.05\
+		,0.969),(0.06,0.972),(0.07,0.975),(0.08,0.978),(0.09,0.981),(0.1,0.983),(0.11,0.986\
+		),(0.12,0.988),(0.13,0.99),(0.14,0.992),(0.15,0.994),(0.16,0.996),(0.17,0.998),(0.18\
+		,0.999),(0.19,1),(0.2,1),(0.21,1),(0.22,1),(0.23,1),(0.24,1),(0.25,1),(0.26,1),(0.27\
+		,1),(0.28,1),(0.29,1),(0.3,1),(0.31,1),(0.32,1),(0.33,1),(0.34,1),(0.35,1),(0.36,1)\
+		,(0.37,1),(0.38,1),(0.39,1),(0.4,1),(0.41,1),(0.42,1),(0.43,1),(0.44,1),(0.45,1),(0.46\
+		,1),(0.47,1),(0.48,1),(0.49,1),(0.5,1),(0.51,1),(0.52,1),(0.53,1),(0.54,1),(0.55,1)\
+		,(0.56,1),(0.57,1),(0.58,1),(0.59,1),(0.6,1),(0.61,1),(0.62,1),(0.63,1),(0.64,1),(0.65\
+		,1),(0.66,1),(0.67,1),(0.68,1),(0.69,1),(0.7,1),(0.71,1),(0.72,1),(0.73,1),(0.74,1)\
+		,(0.75,1),(0.76,1),(0.77,1),(0.78,1.001),(0.79,1.002),(0.8,1.003),(0.81,1.004),(0.82\
+		,1.005),(0.83,1.007),(0.84,1.008),(0.85,1.01),(0.86,1.011),(0.87,1.013),(0.88,1.015\
+		),(0.89,1.017),(0.9,1.019),(0.91,1.022),(0.92,1.024),(0.93,1.027),(0.94,1.03),(0.95\
+		,1.033),(0.96,1.036),(0.97,1.039),(0.98,1.043),(0.99,1.046),(1,1.05))
+	~	Dmnl
+	~		|
+
+User perception of attractiveness for rentals=
+	Table for UPoA as a function of bike availability(Bike availability factor)
+	~	Dmnl
+	~		|
+
+User perception of attractiveness for returns=
+	Table for UPoA as a function of dock availability(Dock availability factor)
+	~	Dmnl
+	~		|
+
+Bike availability factor=
+	QUANTUM(Cluster yin bike stock / Cluster capacity, 0.01)
+	~	Dmnl
+	~		|
+
+Cluster capacity=
+	65
+	~	Bikes
+	~		|
+
+Cluster yin bike stock= INTEG (
+	Return rate-Rental rate,
+		0)
+	~	Bikes
+	~		|
+
+Dock availability factor=
+	1 - Bike availability factor
+	~	Dmnl
+	~		|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 144
+	~	Minute
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = 0
+	~	Minute
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 1
+	~	Minute [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 1
+	~	Minute [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 1
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-0|-1--1--1|-1--1--1|96,96,100,0
+10,1,Cluster yin bike stock,-1572,30,59,28,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+12,2,48,-1794,28,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,3,5,1,4,0,0,22,0,0,0,-1--1--1,,1|(-1666,28)|
+1,4,5,2,100,0,0,22,0,0,0,-1--1--1,,1|(-1748,28)|
+11,5,48,-1706,28,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,6,Return rate,-1706,47,36,11,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,7,48,-1333,31,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,8,10,7,4,0,0,22,0,0,0,-1--1--1,,1|(-1382,31)|
+1,9,10,1,100,0,0,22,0,0,0,-1--1--1,,1|(-1473,31)|
+11,10,48,-1427,31,6,8,34,131,0,0,1,0,0,0,0,0,0,0,0,0
+10,11,Rental rate,-1427,54,48,15,40,131,0,0,-1,0,0,0,0,0,0,0,0,0
+10,12,Bike availability factor,-1726,278,50,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,13,Cluster capacity,-1529,224,51,11,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,14,Dock availability factor,-1962,212,66,28,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,15,User perception of attractiveness for returns,-2065,30,82,28,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,16,Change to returns rate due to UPoA,-1897,-149,71,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,17,1,12,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1599,173)|
+1,18,12,14,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-1847,276)|
+1,19,14,15,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-2047,122)|
+1,20,15,16,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-2047,-81)|
+1,21,16,5,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1722,-80)|
+10,22,Simulated normal return rate,-1655,-119,58,18,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,23,Simulated normal rental rate,-1491,-119,56,17,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,24,User perception of attractiveness for rentals,-1078,30,82,28,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,25,12,24,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1295,221)|
+10,26,Change to rentals rate due to UPoA,-1270,-149,70,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,27,24,26,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1084,-94)|
+1,28,26,10,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1429,-73)|
+1,29,23,10,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1484,-50)|
+1,30,22,5,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1662,-50)|
+1,31,13,12,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-1602,259)|
+10,32,Cluster capacity,-1808,-80,60,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,33,32,5,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1753,-44)|
+1,34,1,6,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-1648,90)|
+1,35,1,11,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1499,87)|
+10,36,Table for UPoA as a function of dock availability,-2041,275,91,18,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+1,37,36,15,1,0,0,0,0,64,0,-1--1--1,,1|(-2130,170)|
+10,38,Table for UPoA as a function of bike availability,-1109,275,84,19,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+1,39,38,24,1,0,0,0,0,64,0,-1--1--1,,1|(-1038,161)|
+1,40,22,16,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1762,-207)|
+1,41,23,26,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1424,-197)|
+10,42,"1/Minute",-1755,119,29,11,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,43,42,6,1,0,0,0,0,64,0,-1--1--1,,1|(-1712,95)|
+10,44,"1/Minute",-1533,123,38,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,45,44,11,1,0,0,0,0,64,0,-1--1--1,,1|(-1454,103)|
+10,46,Use attractiveness quotient,-2092,-197,58,19,8,3,0,16,0,0,0,0,-1--1--1,0-0-0,|12|U|64-64-64,0,0,0,0,0,0
+1,47,46,16,1,0,0,0,0,64,0,-1--1--1,,1|(-1975,-197)|
+10,48,Use attractiveness quotient,-1067,-197,62,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,49,48,26,1,0,0,0,0,64,0,-1--1--1,,1|(-1200,-191)|
+10,50,Goal for lower bound for bike availability or GLB,-1943,615,80,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,51,Perceived bike availability factor less GLB,-2110,421,85,25,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,52,Out of stock risk due to bike unavailability,-2343,263,79,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,53,Perception of risk of OOS due to bike unavailability,-2262,30,81,29,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,54,Perception delay,-2501,158,53,11,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,55,Pressure to incentivize give,-2310,-149,53,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,56,Effect of incentives on returns,-2086,-311,65,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,57,Change to returns rate due to incentives,-1897,-261,71,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,58,51,52,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-2278,342)|
+1,59,53,55,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-2316,-69)|
+1,60,56,57,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1964,-312)|
+1,61,50,51,1,0,43,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-2080,547)|
+12,62,48,-2504,28,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,63,65,53,4,0,0,22,0,0,0,-1--1--1,,1|(-2379,28)|
+1,64,65,62,100,0,0,22,0,0,0,-1--1--1,,1|(-2461,28)|
+11,65,48,-2421,28,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,66,Perception of returns risk update,-2421,55,67,19,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,67,54,66,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-2475,108)|
+1,68,52,66,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-2401,161)|
+1,69,53,66,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-2309,92)|
+10,70,"Table for OOS risk as a function of Bike availability factor - GLB",-2358,453,85,28,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,71,70,52,1,0,0,0,0,64,0,-1--1--1,,1|(-2383,367)|
+10,72,Use incentives,-1874,-412,45,11,8,3,0,16,0,0,0,0,-1--1--1,0-0-0,|12|U|255-128-0,0,0,0,0,0,0
+1,73,72,57,1,0,0,0,0,64,0,-1--1--1,,1|(-1861,-346)|
+10,74,Change to returns rate due to incentives,-1861,-26,75,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,75,Pressure threshold for incentive authorization,-548,-954,70,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,76,Goal for upper bound for bike availability or GUB,-1200,615,80,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,77,GUB less Perceived bike availability factor,-1034,421,85,25,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,78,Out of stock risk due to dock unavailability,-798,263,81,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,79,Perception of risk of OOS due to dock unavailability,-881,30,81,29,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,80,Pressure to incentivize take,-833,-149,54,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,81,Effect of incentives on rentals,-1059,-311,60,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,82,Change to rentals rate due to incentives,-1270,-261,70,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,83,76,77,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1059,538)|
+1,84,77,78,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-882,359)|
+1,85,79,80,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-826,-64)|
+1,86,81,82,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1185,-310)|
+10,87,Change to rentals rate due to incentives,-1299,-26,74,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,88,74,5,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1758,-4)|
+1,89,87,10,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1404,-12)|
+12,90,48,-630,24,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,91,93,79,4,0,0,22,0,0,0,-1--1--1,,1|(-763,24)|
+1,92,93,90,100,0,0,22,0,0,0,-1--1--1,,1|(-677,24)|
+11,93,48,-720,24,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,94,Perception or rentals risk update,-720,51,66,19,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,95,78,94,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-734,161)|
+10,96,Perception delay,-626,158,40,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,97,96,94,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-640,98)|
+1,98,79,94,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-817,94)|
+10,99,Use incentives,-1269,-412,54,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,100,99,82,1,0,0,0,0,64,0,-1--1--1,,1|(-1297,-342)|
+10,101,"Table for OOS risk as a function of GUB - Bike availability factor",-793,453,77,28,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,102,101,78,1,0,0,0,0,64,0,-1--1--1,,1|(-762,361)|
+12,103,0,-1834,79,20,20,4,7,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+B
+12,104,0,-1291,79,20,20,5,7,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+B
+12,105,0,-2168,-99,20,20,4,7,0,16,-1,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+B
+12,106,0,-967,-99,20,20,5,7,0,16,-1,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+B
+10,107,LOOKUP return rate,-1672,-315,55,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,108,LOOKUP rental rate,-1469,-315,54,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,109,107,22,1,0,0,0,0,64,0,-1--1--1,,1|(-1640,-217)|
+1,110,108,23,1,0,0,0,0,64,0,-1--1--1,,1|(-1506,-218)|
+10,111,"1/Minute",-1572,-78,38,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,112,Time,-1572,-172,26,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,113,Perceived bike availability factor,-1706,543,58,30,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+12,114,48,-1497,535,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,115,117,113,4,0,0,22,0,0,0,-1--1--1,,1|(-1610,535)|
+1,116,117,114,100,0,0,22,0,0,0,-1--1--1,,1|(-1534,535)|
+11,117,48,-1566,535,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,118,Update perception,-1566,562,54,19,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,119,LOOKUP projected bike availability factor,-1947,804,69,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,120,Discrepancy to actual,-1640,364,57,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,121,12,120,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1714,324)|
+10,122,Time,-1904,892,26,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,123,Responsiveness to actual,-1341,296,59,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,124,"1/Minute",-1916,852,38,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,125,113,51,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1944,521)|
+10,126,Perceived bike availability factor,-1365,543,58,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,127,126,77,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-1198,505)|
+1,128,111,22,1,0,0,0,0,64,0,-1--1--1,,1|(-1623,-83)|
+1,129,112,22,1,0,0,0,0,64,0,-1--1--1,,1|(-1618,-160)|
+1,130,111,23,1,0,0,0,0,64,0,-1--1--1,,1|(-1519,-82)|
+1,131,112,23,1,0,0,0,0,64,0,-1--1--1,,1|(-1527,-159)|
+10,132,Discrepancy to projected,-1640,709,48,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,133,113,132,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-1733,630)|
+10,134,Projected bike availability factor,-1803,752,54,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,135,119,134,1,0,0,0,0,64,0,-1--1--1,,1|(-1851,805)|
+1,136,134,132,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1698,775)|
+1,137,124,134,1,0,0,0,0,64,0,-1--1--1,,1|(-1835,823)|
+1,138,122,134,1,0,0,0,0,64,0,-1--1--1,,1|(-1828,863)|
+10,139,Cumulated rental rate adjustments,1182,1060,40,20,3,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,140,Cumulated return rate adjustments,1182,1182,40,20,3,3,0,0,0,0,0,0,0,0,0,0,0,0
+12,141,48,998,1055,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,142,144,139,4,0,0,22,0,0,0,-1--1--1,,1|(1111,1055)|
+1,143,144,141,100,0,0,22,0,0,0,-1--1--1,,1|(1038,1055)|
+11,144,48,1075,1055,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,145,Adjustments to simulated rental rate,1075,1082,64,19,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,146,48,997,1184,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,147,149,140,4,0,0,22,0,0,0,-1--1--1,,1|(1109,1184)|
+1,148,149,146,100,0,0,22,0,0,0,-1--1--1,,1|(1035,1184)|
+11,149,48,1070,1184,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,150,Adjustments to simulated return rate,1070,1211,65,19,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,151,Rental rate,846,969,44,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,152,Simulated normal rental rate,846,1080,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,153,Return rate,846,1191,45,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,154,Simulated normal return rate,846,1303,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,155,151,144,1,0,0,0,0,64,0,-1--1--1,,1|(979,964)|
+1,156,152,144,1,0,0,0,0,64,0,-1--1--1,,1|(951,1022)|
+1,157,153,150,1,0,0,0,0,64,0,-1--1--1,,1|(949,1262)|
+1,158,154,150,1,0,0,0,0,64,0,-1--1--1,,1|(973,1317)|
+10,159,Cluster yang or Y bike stock,724,30,59,28,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+12,160,48,500,26,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,161,163,159,4,0,0,22,0,0,0,-1--1--1,,1|(625,25)|
+1,162,163,160,100,0,0,22,0,0,0,-1--1--1,,1|(541,25)|
+11,163,48,579,25,6,8,34,131,0,0,1,0,0,0,0,0,0,0,0,0
+10,164,Return rate at Y,579,45,61,12,40,131,0,0,-1,0,0,0,0,0,0,0,0,0
+12,165,48,961,29,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,166,168,165,4,0,0,22,0,0,0,-1--1--1,,1|(907,29)|
+1,167,168,159,100,0,0,22,0,0,0,-1--1--1,,1|(817,29)|
+11,168,48,858,29,6,8,34,131,0,0,1,0,0,0,0,0,0,0,0,0
+10,169,Rental rate at Y,858,48,64,11,40,131,0,0,-1,0,0,0,0,0,0,0,0,0
+10,170,Bike availability factor at Y,568,278,50,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,171,Cluster capacity at Y,788,224,80,13,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,172,Dock availability factor at Y,332,210,53,19,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,173,User perception of attractiveness for returns at Y,239,30,94,25,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,174,Change to returns rate due to UPoA at Y,397,-149,71,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,175,159,170,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(697,168)|
+1,176,170,172,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(447,274)|
+1,177,172,173,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(257,128)|
+1,178,173,174,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(256,-80)|
+1,179,174,163,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(572,-82)|
+10,180,Simulated normal return rate at Y,639,-119,55,19,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,181,Simulated normal rental rate at Y,803,-119,55,19,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,182,User perception of attractiveness for rentals at Y,1210,30,94,25,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+1,183,170,182,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(999,219)|
+10,184,Change to rentals rate due to UPoA at Y,1024,-149,70,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,185,182,184,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(1210,-96)|
+1,186,184,168,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(870,-77)|
+1,187,181,168,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(810,-52)|
+1,188,180,163,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(632,-52)|
+1,189,171,170,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(696,263)|
+10,190,Cluster capacity at Y,503,-79,55,22,8,130,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,191,190,163,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(541,-46)|
+1,192,159,164,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(648,90)|
+1,193,159,169,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(797,88)|
+10,194,Table for UPoA as a function of dock availability at Y,256,275,67,28,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+1,195,194,173,1,0,0,0,0,64,0,-1--1--1,,1|(164,168)|
+10,196,Table for UPoA as a function of bike availability at Y,1188,275,67,28,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+1,197,196,182,1,0,0,0,0,64,0,-1--1--1,,1|(1256,159)|
+1,198,180,174,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(532,-209)|
+1,199,181,184,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(870,-199)|
+10,200,Use attractiveness quotient at Y,202,-197,58,19,8,3,0,16,0,0,0,0,-1--1--1,0-0-0,|12|U|0-0-0,0,0,0,0,0,0
+1,201,200,174,1,0,0,0,0,64,0,-1--1--1,,1|(319,-199)|
+10,202,Use attractiveness quotient at Y,1227,-197,62,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,203,202,184,1,0,0,0,0,64,0,-1--1--1,,1|(1094,-193)|
+10,204,Goal for lower bound for bike availability or GLB at Y,354,615,91,26,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,205,Perceived bike availability factor less GLB at Y,188,421,67,28,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,206,Out of stock risk due to bike unavailability at Y,-49,263,76,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,207,Perception of risk of OOS due to bike unavailability at Y,32,22,81,29,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,208,Perception delay at Y,-208,158,58,19,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,209,Pressure to incentivize give at Y,-3,-149,68,24,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,210,Effect of incentives on returns at Y,207,-311,60,19,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,211,Change to returns rate due to incentives at Y,397,-261,71,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,212,205,206,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(25,350)|
+1,213,207,209,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-10,-63)|
+1,214,210,211,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(304,-321)|
+1,215,204,205,1,0,43,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(214,545)|
+12,216,48,-210,26,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,217,219,207,4,0,0,22,0,0,0,-1--1--1,,1|(-87,26)|
+1,218,219,216,100,0,0,22,0,0,0,-1--1--1,,1|(-168,26)|
+11,219,48,-130,26,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,220,Perception of returns risk update at Y,-130,53,67,19,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,221,208,220,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-188,98)|
+1,222,206,220,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-117,164)|
+1,223,207,220,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-15,90)|
+10,224,"Table for OOS risk as a function of Bike availability factor - GLB at Y",-60,453,85,28,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,225,224,206,1,0,0,0,0,64,0,-1--1--1,,1|(-89,365)|
+10,226,Change to returns rate due to incentives at Y,441,-28,75,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,227,Goal for upper bound for bike availability or GUB at Y,1094,615,91,26,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,228,GUB less Perceived bike availability factor at Y,1260,421,67,28,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,229,Out of stock risk due to dock unavailability at Y,1496,263,76,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,230,Perception of risk of OOS due to dock unavailability at Y,1413,22,81,29,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,231,Pressure to incentivize take at Y,1448,-149,68,24,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,232,Effect of incentives on rentals at Y,1235,-311,60,19,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,233,Change to rentals rate due to incentives at Y,1024,-261,70,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,234,227,228,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(1235,536)|
+1,235,228,229,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(1412,354)|
+1,236,230,231,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(1450,-57)|
+1,237,232,233,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(1104,-307)|
+10,238,Change to rentals rate due to incentives at Y,1002,-28,74,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,239,226,163,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(536,-6)|
+1,240,238,168,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(880,-6)|
+12,241,48,1664,22,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,242,244,230,4,0,0,22,0,0,0,-1--1--1,,1|(1538,22)|
+1,243,244,241,100,0,0,22,0,0,0,-1--1--1,,1|(1624,22)|
+11,244,48,1588,22,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,245,Perception or rentals risk update at Y,1588,49,66,19,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,246,229,245,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(1570,159)|
+10,247,Perception delay at Y,1668,158,40,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,248,247,245,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(1654,96)|
+1,249,230,245,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(1477,92)|
+10,250,"Table for OOS risk as a function of GUB - Bike availability factor at Y",1501,453,77,28,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,251,250,229,1,0,0,0,0,64,0,-1--1--1,,1|(1532,359)|
+12,252,0,460,77,20,20,4,7,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+B
+12,253,0,1003,77,20,20,5,7,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+B
+12,254,0,126,-101,20,20,4,7,0,16,-1,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+B
+12,255,0,1327,-101,20,20,5,7,0,16,-1,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+B
+10,256,LOOKUP return rate at Y,622,-315,55,19,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,257,LOOKUP rental rate at Y,825,-315,55,19,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+1,258,256,180,1,0,0,0,0,64,0,-1--1--1,,1|(654,-219)|
+1,259,257,181,1,0,0,0,0,64,0,-1--1--1,,1|(788,-220)|
+10,260,Time,721,-174,26,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,261,Perceived bike availability factor at Y,588,541,58,30,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+12,262,48,797,533,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,263,265,261,4,0,0,22,0,0,0,-1--1--1,,1|(683,533)|
+1,264,265,262,100,0,0,22,0,0,0,-1--1--1,,1|(760,533)|
+11,265,48,727,533,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,266,Update perception at Y,727,551,79,10,40,131,0,0,-1,0,0,0,0,0,0,0,0,0
+10,267,LOOKUP projected bike availability factor at Y,342,804,76,26,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,268,Discrepancy to actual at Y,651,364,48,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,269,170,268,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(573,332)|
+10,270,Time,392,892,26,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,271,Responsiveness to actual at Y,987,296,59,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,272,261,205,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(350,519)|
+10,273,Perceived bike availability factor at Y,945,543,81,25,8,130,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,274,273,228,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(1096,503)|
+1,275,260,180,1,0,0,0,0,64,0,-1--1--1,,1|(676,-162)|
+1,276,260,181,1,0,0,0,0,64,0,-1--1--1,,1|(767,-161)|
+10,277,Discrepancy to projected at Y,651,709,48,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,278,261,277,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(573,627)|
+10,279,Projected bike availability factor at Y,510,752,77,28,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+1,280,267,279,1,0,0,0,0,64,0,-1--1--1,,1|(440,796)|
+1,281,279,277,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(625,775)|
+1,282,270,279,1,0,0,0,0,64,0,-1--1--1,,1|(457,861)|
+10,283,"1/Minute",510,123,38,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,284,283,164,1,0,0,0,0,64,0,-1--1--1,,1|(561,99)|
+10,285,"1/Minute",801,123,38,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,286,285,169,1,0,0,0,0,64,0,-1--1--1,,1|(863,99)|
+10,287,"1/Minute",380,852,38,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,288,287,279,1,0,0,0,0,64,0,-1--1--1,,1|(453,824)|
+10,289,"1/Minute",725,-78,38,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,290,289,180,1,0,0,0,0,64,0,-1--1--1,,1|(674,-82)|
+1,291,289,181,1,0,0,0,0,64,0,-1--1--1,,1|(777,-83)|
+10,292,Cumulated rental rate adjustments at Y,1134,1492,71,21,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,293,Cumulated return rate adjustments at Y,1138,1614,71,21,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+12,294,48,923,1486,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,295,297,292,4,0,0,22,0,0,0,-1--1--1,,1|(1034,1486)|
+1,296,297,294,100,0,0,22,0,0,0,-1--1--1,,1|(963,1486)|
+11,297,48,1000,1486,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,298,Adjustments to simulated rental rate at Y,1000,1520,70,26,40,131,0,0,-1,0,0,0,0,0,0,0,0,0
+12,299,48,922,1615,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,300,302,293,4,0,0,22,0,0,0,-1--1--1,,1|(1034,1615)|
+1,301,302,299,100,0,0,22,0,0,0,-1--1--1,,1|(960,1615)|
+11,302,48,995,1615,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,303,Adjustments to simulated return rate at Y,995,1649,64,26,40,131,0,0,-1,0,0,0,0,0,0,0,0,0
+10,304,Rental rate at Y,771,1400,59,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,305,Return rate at Y,771,1622,60,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,306,Simulated normal return rate at Y,771,1734,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,307,Simulated normal rental rate at Y,771,1511,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,308,304,297,1,0,0,0,0,64,0,-1--1--1,,1|(891,1381)|
+1,309,307,297,1,0,0,0,0,64,0,-1--1--1,,1|(870,1445)|
+1,310,305,303,1,0,0,0,0,64,0,-1--1--1,,1|(871,1686)|
+1,311,306,303,1,0,0,0,0,64,0,-1--1--1,,1|(910,1737)|
+10,312,Perception of risk of OOS due to dock unavailability at Y,-2587,-206,89,28,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,313,Perception of risk of OOS due to bike unavailability at Y,-549,-206,89,28,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,314,Perception of risk of OOS due to dock unavailability,-281,-206,70,28,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,315,Perception of risk of OOS due to bike unavailability,1752,-206,70,28,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,316,315,231,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(1630,-82)|
+1,317,312,55,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-2474,-95)|
+1,318,313,80,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-677,-89)|
+1,319,314,209,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-168,-78)|
+10,320,Expected returns uplift,-1135,-2084,54,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,321,LOOKUP causal impact of give incentivization,-1137,-2225,79,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,322,"1/Minute",-978,-2196,38,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,323,Time,-983,-2133,26,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,324,Expected rentals uplift,-822,-2084,53,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,325,LOOKUP causal impact of take incentivization,-827,-2225,79,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,326,Expected returns uplift at Y,-280,-2084,54,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,327,LOOKUP causal impact of give incentivization at Y,-305,-2225,89,24,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,328,Expected rentals uplift at Y,33,-2090,53,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,329,LOOKUP causal impact of take incentivization at Y,25,-2225,89,24,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,330,Out of Stock of bikes,1652,1060,40,20,3,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,331,Out of Stock of docks,1652,1182,40,20,3,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,332,Rental rate,1338,969,44,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,333,Simulated normal rental rate,1338,1080,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,334,Return rate,1338,1191,45,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,335,Simulated normal return rate,1338,1303,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+12,336,48,1496,1057,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,337,339,330,4,0,0,22,0,0,0,-1--1--1,,1|(1582,1057)|
+1,338,339,336,100,0,0,22,0,0,0,-1--1--1,,1|(1523,1057)|
+11,339,48,1546,1057,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,340,Bike stockouts,1546,1076,47,11,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,341,48,1496,1182,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,342,344,331,4,0,0,22,0,0,0,-1--1--1,,1|(1583,1182)|
+1,343,344,341,100,0,0,22,0,0,0,-1--1--1,,1|(1524,1182)|
+11,344,48,1549,1182,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,345,Dock stockouts,1549,1201,50,11,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,346,332,339,1,0,0,0,0,64,0,-1--1--1,,1|(1434,950)|
+1,347,333,339,1,0,0,0,0,64,0,-1--1--1,,1|(1430,1009)|
+1,348,334,345,1,0,0,0,0,64,0,-1--1--1,,1|(1444,1255)|
+1,349,335,345,1,0,0,0,0,64,0,-1--1--1,,1|(1480,1310)|
+10,350,Out of Stock of bikes at Y,1693,1492,58,19,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,351,Out of Stock of docks at Y,1693,1614,58,19,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+12,352,48,1501,1494,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,353,355,350,4,0,0,22,0,0,0,-1--1--1,,1|(1607,1494)|
+1,354,355,352,100,0,0,22,0,0,0,-1--1--1,,1|(1539,1494)|
+11,355,48,1573,1494,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,356,Bike stockouts at Y,1573,1521,48,19,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,357,48,1501,1612,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,358,360,351,4,0,0,22,0,0,0,-1--1--1,,1|(1607,1612)|
+1,359,360,357,100,0,0,22,0,0,0,-1--1--1,,1|(1539,1612)|
+11,360,48,1573,1612,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,361,Dock stockouts at Y,1573,1639,51,19,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,362,Rental rate at Y,1351,1400,59,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,363,Simulated normal rental rate at Y,1351,1511,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,364,Return rate at Y,1351,1622,60,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,365,Simulated normal return rate at Y,1351,1734,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,366,362,355,1,0,0,0,0,64,0,-1--1--1,,1|(1466,1380)|
+1,367,363,355,1,0,0,0,0,64,0,-1--1--1,,1|(1457,1437)|
+1,368,364,361,1,0,0,0,0,64,0,-1--1--1,,1|(1447,1681)|
+1,369,365,361,1,0,0,0,0,64,0,-1--1--1,,1|(1519,1721)|
+10,370,Simulated normal return rate,-1314,-2155,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,371,Simulated normal rental rate,-644,-2155,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,372,370,320,1,0,0,0,0,64,0,-1--1--1,,1|(-1270,-2096)|
+1,373,321,320,1,0,0,0,0,64,0,-1--1--1,,1|(-1214,-2156)|
+1,374,323,320,1,0,0,0,0,64,0,-1--1--1,,1|(-1024,-2095)|
+1,375,322,320,1,0,0,0,0,64,0,-1--1--1,,1|(-1019,-2134)|
+1,376,323,324,1,0,0,0,0,64,0,-1--1--1,,1|(-941,-2097)|
+1,377,322,324,1,0,0,0,0,64,0,-1--1--1,,1|(-932,-2125)|
+1,378,325,324,1,0,0,0,0,64,0,-1--1--1,,1|(-769,-2157)|
+1,379,371,324,1,0,0,0,0,64,0,-1--1--1,,1|(-695,-2112)|
+10,380,Simulated normal return rate at Y,-459,-2155,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,381,Simulated normal rental rate at Y,217,-2155,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,382,"1/Minute",-123,-2196,38,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,383,Time,-123,-2145,26,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,384,380,326,1,0,0,0,0,64,0,-1--1--1,,1|(-401,-2096)|
+1,385,327,326,1,0,0,0,0,64,0,-1--1--1,,1|(-369,-2163)|
+1,386,382,326,1,0,0,0,0,64,0,-1--1--1,,1|(-191,-2131)|
+1,387,383,326,1,0,0,0,0,64,0,-1--1--1,,1|(-163,-2104)|
+1,388,383,328,1,0,0,0,0,64,0,-1--1--1,,1|(-76,-2102)|
+1,389,382,328,1,0,0,0,0,64,0,-1--1--1,,1|(-70,-2134)|
+1,390,329,328,1,0,0,0,0,64,0,-1--1--1,,1|(104,-2164)|
+1,391,381,328,1,0,0,0,0,64,0,-1--1--1,,1|(150,-2112)|
+10,392,Inventory balancing return offset at Y due to give at X,-459,-1926,84,28,8,131,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+10,393,Inventory balancing rental offset at Y due to give at X,217,-1926,83,28,8,3,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+10,394,Inventory balancing return offset at X due to give at Y,-1244,-1926,84,28,8,3,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+10,395,Inventory balancing rental offset at X due to give at Y,-644,-1926,83,28,8,3,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+1,396,380,392,1,0,0,0,0,64,0,-1--1--1,,1|(-518,-2038)|
+1,397,392,393,1,0,0,0,0,64,0,-1--1--1,,1|(-70,-1842)|
+1,398,370,394,1,0,0,0,0,64,0,-1--1--1,,1|(-1327,-2041)|
+1,399,394,395,1,0,0,0,0,64,0,-1--1--1,,1|(-966,-1843)|
+10,400,Inventory balancing rental offset at Y due to take at X,217,-1699,83,28,8,3,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+10,401,Inventory balancing return offset at Y due to take at X,-459,-1699,84,28,8,131,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+10,402,Expected returns uplift at Y,-944,-1796,59,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,403,402,394,1,0,0,0,0,64,0,-1--1--1,,1|(-1123,-1829)|
+10,404,Expected rentals uplift,-121,-1580,58,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,405,404,400,1,0,0,0,0,64,0,-1--1--1,,1|(59,-1614)|
+1,406,381,400,1,0,0,0,0,64,0,-1--1--1,,1|(334,-1935)|
+1,407,402,395,1,0,0,0,0,64,0,-1--1--1,,1|(-777,-1825)|
+1,408,404,401,1,0,0,0,0,64,0,-1--1--1,,1|(-298,-1614)|
+1,409,400,401,1,0,0,0,0,64,0,-1--1--1,,1|(-118,-1632)|
+10,410,Inventory balancing rental offset at X due to take at Y,-644,-1699,83,28,8,3,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+10,411,Inventory balancing return offset at X due to take at Y,-1244,-1699,84,28,8,3,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+10,412,Expected rentals uplift at Y,-944,-1580,58,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,413,412,410,1,0,0,0,0,64,0,-1--1--1,,1|(-794,-1600)|
+10,414,Simulated normal rental rate,-644,-1843,60,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,415,414,410,1,0,0,0,0,64,0,-1--1--1,,1|(-731,-1776)|
+1,416,412,411,1,0,0,0,0,64,0,-1--1--1,,1|(-1100,-1599)|
+1,417,410,411,1,0,0,0,0,64,0,-1--1--1,,1|(-956,-1628)|
+10,418,Expected returns uplift,-121,-1796,59,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,419,418,393,1,0,0,0,0,64,0,-1--1--1,,1|(82,-1823)|
+1,420,418,392,1,0,0,0,0,64,0,-1--1--1,,1|(-311,-1823)|
+10,421,Inventory balancing offset with complementarity at X or Y due to give at X,-551,-1383,101,28,8,3,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+10,422,Inventory balancing offset with complementarity at X or Y due to take at X,-552,-1228,101,28,8,3,0,16,0,0,0,0,-1--1--1,0-0-0,|12|B|0-0-0,0,0,0,0,0,0
+10,423,Expected returns uplift,-1135,-1525,59,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,424,Expected rentals uplift at Y,33,-1525,58,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,425,Expected returns uplift at Y,-240,-1316,59,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,426,Expected rentals uplift,-863,-1316,58,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,427,423,421,1,0,0,0,0,64,0,-1--1--1,,1|(-941,-1421)|
+1,428,424,421,1,0,0,0,0,64,0,-1--1--1,,1|(-211,-1411)|
+1,429,426,422,1,0,0,0,0,64,0,-1--1--1,,1|(-742,-1247)|
+1,430,425,422,1,0,0,0,0,64,0,-1--1--1,,1|(-359,-1255)|
+10,431,Give at X,-791,-1043,31,11,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,432,Take at X,-465,-1043,33,11,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,433,Give at Y,-629,-1043,31,11,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,434,Take at Y,-298,-1043,33,11,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,435,Pressure to incentivize give,-791,-1134,52,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,436,Pressure to incentivize take,-464,-1134,53,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,437,Pressure to incentivize give at Y,-628,-1134,68,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,438,Pressure to incentivize take at Y,-298,-1134,69,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,439,435,431,1,0,0,0,0,64,0,-1--1--1,,1|(-854,-1089)|
+1,440,437,433,1,0,0,0,0,64,0,-1--1--1,,1|(-586,-1093)|
+1,441,438,434,1,0,0,0,0,64,0,-1--1--1,,1|(-227,-1082)|
+1,442,436,432,1,0,0,0,0,64,0,-1--1--1,,1|(-491,-1083)|
+1,443,437,431,1,0,0,0,0,64,0,-1--1--1,,1|(-713,-1067)|
+1,444,435,433,1,0,0,0,0,64,0,-1--1--1,,1|(-713,-1067)|
+1,445,438,432,1,0,0,0,0,64,0,-1--1--1,,1|(-378,-1064)|
+1,446,436,434,1,0,0,0,0,64,0,-1--1--1,,1|(-377,-1064)|
+10,447,Return adjustment up at X due to incentives,-2084,-678,75,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,448,Return adjustment down at X due to incentives,-1413,-678,78,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,449,Give at X,-2445,-786,40,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,450,Take at Y,-2333,-786,42,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,451,Expected returns uplift,-2202,-786,59,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,452,Inventory balancing offset with complementarity at X or Y due to give at X,-2012,-786,101,28,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,453,449,447,1,0,0,0,0,64,0,-1--1--1,,1|(-2364,-736)|
+1,454,450,447,1,0,0,0,0,64,0,-1--1--1,,1|(-2264,-733)|
+1,455,451,447,1,0,0,0,0,64,0,-1--1--1,,1|(-2181,-737)|
+1,456,452,447,1,0,0,0,0,64,0,-1--1--1,,1|(-2019,-731)|
+10,457,Inventory balancing return offset at X due to give at Y,-1565,-787,91,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,458,457,448,1,0,0,0,0,64,0,-1--1--1,,1|(-1550,-726)|
+10,459,Take at X,-1314,-787,42,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,460,Give at Y,-1202,-787,40,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,461,Expected rentals uplift,-1071,-787,58,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,462,Inventory balancing offset with complementarity at X or Y due to take at X,-881,-787,101,28,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,463,Inventory balancing rental offset at X due to give at Y,-657,-787,91,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,464,Rental adjustment up at X due to incentives,-953,-678,74,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,465,459,464,1,0,0,0,0,64,0,-1--1--1,,1|(-1244,-740)|
+1,466,460,464,1,0,0,0,0,64,0,-1--1--1,,1|(-1135,-737)|
+1,467,461,464,1,0,0,0,0,64,0,-1--1--1,,1|(-1048,-738)|
+1,468,462,464,1,0,0,0,0,64,0,-1--1--1,,1|(-886,-727)|
+1,469,463,464,1,0,0,0,0,64,0,-1--1--1,,1|(-782,-697)|
+10,470,Rental adjustment down at X due to incentives,-2544,-678,77,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,471,Inventory balancing rental offset at X due to take at Y,-2696,-786,92,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,472,449,470,1,0,0,0,0,64,0,-1--1--1,,1|(-2440,-737)|
+1,473,450,470,1,0,0,0,0,64,0,-1--1--1,,1|(-2386,-710)|
+1,474,471,470,1,0,0,0,0,64,0,-1--1--1,,1|(-2677,-721)|
+1,475,459,448,1,0,0,0,0,64,0,-1--1--1,,1|(-1315,-733)|
+1,476,460,448,1,0,0,0,0,64,0,-1--1--1,,1|(-1250,-717)|
+10,477,Give at Y,-181,-787,40,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,478,Expected returns uplift at Y,62,-787,59,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,479,Inventory balancing offset with complementarity at X or Y due to take at X,252,-787,101,28,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,480,Inventory balancing return offset at X due to take at Y,-1788,-787,92,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,481,480,447,1,0,0,0,0,64,0,-1--1--1,,1|(-1886,-712)|
+10,482,Inventory balancing return offset at Y due to take at X,476,-787,92,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,483,Return adjustment up at Y due to incentives,180,-678,75,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,484,Rental adjustment down at Y due to incentives,-280,-678,77,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,485,Inventory balancing return offset at Y due to give at X,-432,-787,91,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,486,485,484,1,0,0,0,0,64,0,-1--1--1,,1|(-419,-731)|
+1,487,477,484,1,0,0,0,0,64,0,-1--1--1,,1|(-201,-725)|
+1,488,477,483,1,0,0,0,0,64,0,-1--1--1,,1|(-102,-736)|
+1,489,478,483,1,0,0,0,0,64,0,-1--1--1,,1|(84,-736)|
+1,490,479,483,1,0,0,0,0,64,0,-1--1--1,,1|(242,-731)|
+1,491,482,483,1,0,0,0,0,64,0,-1--1--1,,1|(376,-711)|
+10,492,Take at X,-69,-787,42,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,493,492,484,1,0,0,0,0,64,0,-1--1--1,,1|(-117,-719)|
+1,494,492,483,1,0,0,0,0,64,0,-1--1--1,,1|(-10,-739)|
+10,495,Take at Y,959,-787,42,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,496,Expected rentals uplift at Y,1202,-787,58,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,497,Inventory balancing offset with complementarity at X or Y due to give at X,1392,-787,101,28,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,498,Inventory balancing rental offset at Y due to give at X,1616,-787,91,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,499,Rental adjustment up at Y due to incentives,1320,-678,74,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,500,Return adjustment down at Y due to incentives,860,-678,78,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,501,Inventory balancing return offset at Y due to give at X,708,-787,91,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,502,496,499,1,0,0,0,0,64,0,-1--1--1,,1|(1218,-736)|
+1,503,497,499,1,0,0,0,0,64,0,-1--1--1,,1|(1404,-729)|
+1,504,498,499,1,0,0,0,0,64,0,-1--1--1,,1|(1497,-704)|
+1,505,495,499,1,0,0,0,0,64,0,-1--1--1,,1|(1026,-740)|
+1,506,495,500,1,0,0,0,0,64,0,-1--1--1,,1|(945,-738)|
+1,507,501,500,1,0,0,0,0,64,0,-1--1--1,,1|(726,-718)|
+10,508,Give at X,1071,-787,40,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,509,508,500,1,0,0,0,0,64,0,-1--1--1,,1|(1021,-716)|
+1,510,508,499,1,0,0,0,0,64,0,-1--1--1,,1|(1138,-734)|
+1,511,279,261,1,0,0,0,0,64,1,-1--1--1,,1|(491,694)|
+1,512,134,113,1,0,0,0,0,64,1,-1--1--1,,1|(-1814,676)|
+1,513,447,56,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-2139,-516)|
+1,514,448,56,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-1909,-493)|
+1,515,464,81,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1080,-503)|
+10,516,Rental adjustment down at X due to incentives,-857,-412,81,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,517,516,81,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-971,-394)|
+12,518,0,-2259,-258,47,26,3,199,0,20,-1,0,0,0,-1--1--1,192-255-192,|12|B|0-0-0,0,0,0,0,0,0
+Incentive precalc (give at ying)
+1,519,518,56,1,0,0,0,0,64,0,-1--1--1,,1|(-2206,-300)|
+1,520,55,518,1,0,0,0,0,64,0,-1--1--1,,1|(-2304,-196)|
+12,521,0,-891,-258,47,26,3,199,0,20,-1,0,0,0,-1--1--1,255-192-128,|12|B|0-0-0,0,0,0,0,0,0
+Incentive precalc (take at ying)
+12,522,0,81,-258,47,26,3,199,0,20,-1,0,0,0,-1--1--1,192-255-192,|12|B|0-0-0,0,0,0,0,0,0
+Incentive precalc (give at yang)
+12,523,0,1366,-258,47,26,3,199,0,20,-1,0,0,0,-1--1--1,255-192-128,|12|B|0-0-0,0,0,0,0,0,0
+Incentive precalc (take at yang)
+1,524,80,521,1,0,0,0,0,64,0,-1--1--1,,1|(-841,-198)|
+1,525,521,81,1,0,0,0,0,64,0,-1--1--1,,1|(-946,-305)|
+1,526,483,210,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(133,-509)|
+1,527,500,210,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(377,-498)|
+1,528,209,522,1,0,0,0,0,64,0,-1--1--1,,1|(16,-199)|
+1,529,522,210,1,0,0,0,0,64,0,-1--1--1,,1|(108,-296)|
+1,530,231,523,1,0,0,0,0,64,0,-1--1--1,,1|(1434,-198)|
+1,531,523,232,1,0,0,0,0,64,0,-1--1--1,,1|(1331,-298)|
+10,532,Use incentives,417,-412,54,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,533,532,211,1,0,0,0,0,64,0,-1--1--1,,1|(454,-342)|
+10,534,Use incentives,1027,-400,54,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,535,534,233,1,0,0,0,0,64,0,-1--1--1,,1|(976,-340)|
+1,536,499,232,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(1190,-502)|
+10,537,Rental adjustment down at Y due to incentives,1400,-412,81,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,538,537,232,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(1271,-374)|
+1,539,75,431,1,0,0,0,0,64,0,-1--1--1,,1|(-694,-967)|
+1,540,75,433,1,0,0,0,0,64,0,-1--1--1,,1|(-640,-989)|
+1,541,75,432,1,0,0,0,0,64,0,-1--1--1,,1|(-457,-994)|
+1,542,75,434,1,0,0,0,0,64,0,-1--1--1,,1|(-393,-969)|
+12,543,0,-2570,1131,259,213,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+Out_of_Stock
+12,544,0,-1987,1131,259,213,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+Availability
+12,545,0,-821,1131,259,213,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+OOS_bike_risk
+12,546,0,-238,1131,259,213,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+OOS_dock_risk
+12,547,0,-1404,1582,259,213,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+Effect_of_incentives
+12,548,0,-2570,1582,259,213,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+Expected_promotional_eff
+12,549,0,-1987,1582,259,213,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+Expected_promotional_eff_0
+12,550,0,-821,1582,259,213,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+Effect_of_incentives_(re
+12,551,0,-1404,1131,259,213,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+Forecasted_availability
+10,552,"Total OOS at YING-YANG",2073,1337,48,19,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,553,Out of Stock of bikes,1864,1209,55,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,554,Out of Stock of bikes at Y,2003,1209,55,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,555,Out of Stock of docks,2142,1209,55,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,556,Out of Stock of docks at Y,2283,1209,55,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,557,553,552,1,0,0,0,0,64,0,-1--1--1,,1|(1909,1276)|
+1,558,554,552,1,0,0,0,0,64,0,-1--1--1,,1|(2003,1265)|
+1,559,555,552,1,0,0,0,0,64,0,-1--1--1,,1|(2135,1267)|
+1,560,556,552,1,0,0,0,0,64,0,-1--1--1,,1|(2232,1273)|
+12,561,0,-2570,775,259,114,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+OOS_Overview
+1,562,113,120,1,0,45,0,26,64,0,-1--1--1,|16|B|255-0-0,1|(-1731,445)|
+1,563,261,268,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(556,444)|
+10,564,Time,710,1189,26,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,565,Synchronization frequency,538,1178,50,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,566,Time since refresh,636,1121,57,11,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,567,LOOKUP steepness,-1237,379,35,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,568,LOOKUP midpoint,-1237,327,35,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,569,Adaptive responsiveness factor,-1458,371,70,18,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+1,570,565,566,1,0,0,0,0,64,0,-1--1--1,,1|(552,1144)|
+1,571,564,566,1,0,0,0,0,64,0,-1--1--1,,1|(715,1155)|
+10,572,Time since refresh,-1237,431,39,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,573,572,569,1,0,0,0,0,64,0,-1--1--1,,1|(-1334,422)|
+1,574,567,569,1,0,0,0,0,64,0,-1--1--1,,1|(-1327,385)|
+1,575,568,569,1,0,0,0,0,64,0,-1--1--1,,1|(-1341,356)|
+1,576,123,569,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1382,336)|
+10,577,Adjustment towards actual,-1555,452,47,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,578,120,577,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1580,402)|
+1,579,569,577,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1533,403)|
+1,580,577,117,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1553,501)|
+10,581,Adaptive responsiveness factor,-1475,718,70,18,8,130,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,582,Adjustment towards projected,-1555,638,65,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,583,132,582,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(-1574,689)|
+1,584,582,118,1,0,0,0,0,64,0,-1--1--1,,1|(-1542,607)|
+1,585,581,582,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(-1536,685)|
+10,586,"1/Minute",-1479,483,38,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,587,586,117,1,0,0,0,0,64,0,-1--1--1,,1|(-1522,513)|
+10,588,Adaptive responsiveness factor at Y,899,412,84,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,589,LOOKUP midpoint,1104,327,40,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,590,LOOKUP steepness,1104,379,40,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,591,Time since refresh,1104,431,39,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+10,592,Adjustment towards projected at Y,761,638,65,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,593,Adjustment towards actual at Y,754,452,65,19,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,594,"1/Minute",861,486,38,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,595,268,593,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(733,397)|
+1,596,588,593,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(788,412)|
+1,597,593,265,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(754,493)|
+1,598,277,592,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(734,690)|
+1,599,592,266,1,0,0,0,0,64,0,-1--1--1,,1|(766,590)|
+10,600,Adaptive responsiveness factor at Y,899,718,68,28,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128,0,0,0,0,0,0
+1,601,600,592,1,0,45,0,26,128,0,-1--1--1,|16|B|255-0-0,1|(788,691)|
+1,602,594,265,1,0,0,0,0,64,0,-1--1--1,,1|(781,521)|
+1,603,271,588,1,0,43,0,26,128,0,-1--1--1,|16|B|0-128-0,1|(963,357)|
+1,604,589,588,1,0,0,0,0,64,0,-1--1--1,,1|(1010,365)|
+1,605,590,588,1,0,0,0,0,64,0,-1--1--1,,1|(1005,401)|
+1,606,591,588,1,0,0,0,0,64,0,-1--1--1,,1|(1031,446)|
+1,607,586,569,1,0,0,0,0,64,0,-1--1--1,,1|(-1440,444)|
+1,608,594,588,1,0,0,0,0,64,0,-1--1--1,,1|(883,458)|
+///---\\\
+:GRAPH Out_of_Stock
+:TITLE Out of Stock
+:X-LABEL Periods
+:X-DIV 12
+:Y-DIV 10
+:SCALE
+:VAR Out of Stock of bikes|Out of Stock of bikes
+:VAR Out of Stock of bikes at Y|Out of Stock of bikes at Y
+:VAR Out of Stock of docks|Out of Stock of docks
+:VAR Out of Stock of docks at Y|Out of Stock of docks at Y
+
+:GRAPH Availability
+:TITLE Availability
+:X-LABEL Periods
+:X-DIV 12
+:Y-DIV 4
+:SCALE
+:VAR Bike availability factor|Bike availability factor
+:Y-MAX 1
+:VAR Bike availability factor at Y|Bike availability factor at Y
+:Y-MAX 1
+
+:GRAPH OOS_bike_risk
+:TITLE OOS bike risk
+:X-LABEL Periods
+:X-DIV 12
+:Y-DIV 5
+:SCALE
+:VAR Perception of risk of OOS due to bike unavailability|Perception of risk of OOS due to bike unavailability
+:VAR Perception of risk of OOS due to bike unavailability at Y|Perception of risk of OOS due to bike unavailability at Y
+
+:GRAPH OOS_dock_risk
+:TITLE OOS dock risk
+:X-LABEL Periods
+:X-DIV 12
+:Y-DIV 5
+:SCALE
+:VAR Perception of risk of OOS due to dock unavailability|Perception of risk of OOS due to dock unavailability
+:VAR Perception of risk of OOS due to dock unavailability at Y|Perception of risk of OOS due to dock unavailability at Y
+
+:GRAPH Effect_of_incentives
+:TITLE Effect of incentives (returns)
+:X-LABEL Periods
+:X-DIV 12
+:SCALE
+:VAR Change to returns rate due to incentives|Change to returns rate due to incentives
+:VAR Change to returns rate due to incentives at Y|Change to returns rate due to incentives at Y
+
+:GRAPH Expected_promotional_eff
+:TITLE Expected promotional effects (returns)
+:X-LABEL Periods
+:X-DIV 12
+:SCALE
+:VAR Expected returns uplift|Expected returns uplift
+:VAR Expected returns uplift at Y|Expected returns uplift at Y
+
+:GRAPH Expected_promotional_eff_0
+:TITLE Expected promotional effect (rentals)
+:X-LABEL Periods
+:X-DIV 12
+:SCALE
+:VAR Expected rentals uplift|Expected rentals uplift
+:VAR Expected rentals uplift at Y|Expected rentals uplift at Y
+
+:GRAPH Effect_of_incentives_(re
+:TITLE Effect of incentives (rentals)
+:X-LABEL Periods
+:X-DIV 12
+:SCALE
+:VAR Change to rentals rate due to incentives|Change to rentals rate due to incentives
+:VAR Change to rentals rate due to incentives at Y|Change to rentals rate due to incentives at Y
+
+:GRAPH Forecasted_availability
+:TITLE Perceived availability
+:X-LABEL Periods
+:X-DIV 12
+:SCALE
+:VAR Projected bike availability factor|Projected bike availability factor
+:Y-MIN 0
+:Y-MAX 1
+:VAR Perceived bike availability factor|Perceived bike availability factor
+:Y-MIN 0
+:Y-MAX 1
+:LINE-WIDTH 2
+:VAR Projected bike availability factor at Y|Projected bike availability factor at Y
+:Y-MIN 0
+:Y-MAX 1
+:VAR Perceived bike availability factor at Y|Perceived bike availability factor at Y
+:Y-MIN 0
+:Y-MAX 1
+:LINE-WIDTH 2
+
+:TABLE OOS_Overview
+:TITLE OOS Overview
+:PRETTYNUM
+:X-MIN 144
+:X-MAX 144
+:FIRST-CELLWIDTH 30
+:CELLWIDTH 14
+:FONT Times New Roman|12||0-0-0
+:VAR Out of Stock of bikes
+:VAR Out of Stock of bikes at Y
+:VAR Out of Stock of docks
+:VAR Out of Stock of docks at Y
+:VAR "Total OOS at YING-YANG"
+:L<%^E!@
+9:D=24_DMDEL, MA=6, UF=0
+22:$,Dollar,Dollars,$s
+22:Day,Days
+22:Hour,Hours
+22:Month,Months
+22:Person,People,Persons
+22:Unit,Units
+22:Week,Weeks
+22:Year,Years
+23:0
+15:0,0,0,0,0,0
+19:100,0
+27:0,
+34:0,
+42:1
+72:0
+73:0
+4:Time
+5:"1/Minute"
+35:Date
+36:YYYY-MM-DD
+37:2000
+38:1
+39:1
+40:6
+41:0
+76:0
+77:0
+78:0
+79:0
+80:0
+81:0
+92:0
+24:0
+25:144
+26:144
+91:0
+90:0
+87:0
+75:
+43:
