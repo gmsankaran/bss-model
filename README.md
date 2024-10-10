@@ -16,6 +16,7 @@ This repository contains a Python script for simulating a bike-sharing scenario 
 - Data and model files (not included in the script) should be placed in the following folders:
   - `Data/`: Folder containing input data for the simulation.
   - `Models/`: Folder for forecasting models.
+  - `Predictions/`: Folder containing forecast input files for the simulation.
   - `Vensim models/`: Folder containing Vensim simulation models.
 
 ## Running the Simulation
